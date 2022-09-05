@@ -1,5 +1,5 @@
 {
   "scripts": {
-    "run": "cd ./client && npm run dev && cd ../server && npm run server"
+    "eshop": "(cd ./server && npm run server) & (cd ../client && npm run dev)"
   }
 }
