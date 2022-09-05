@@ -1,5 +1,6 @@
 {
   "scripts": {
-    "eshop": "(cd ./server && npm run server) & (cd ../client && npm run dev)"
+    "eshop": "(cd ./server && npm run server) & (cd ../client && npm run dev)",
+    "initialize": "(cd ./server && npm run init) & (cd ../client && npm run init)"
   }
 }
