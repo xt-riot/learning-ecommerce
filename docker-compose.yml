@@ -1,0 +1,42 @@
+# version: '3'
+# services:
+#   app:
+#     build: .
+#     restart: unless-stopped
+#     ports:
+#       - "8080:8080"
+#     environment:
+#       - MONGO_DB_URI=mongodb://mongodb/audios
+#     stdin_open: true
+#     tty: true
+# volumes:
+#   db:
+#     external: true
+
+version: '3'
+
+services:
+  backend:
+    env_file:
+        "./.env"
+    build:
+      context: ./server
+      dockerfile: ./Dockerfile
+      args:
+        - "NODE_ENV=${NODE_ENV}"
+        - "SERVER_PORT=${SERVER_PORT}"
+    ports:
+      - "${DOCKER_SERVER_PORT_FORWARD}:${SERVER_PORT}"
+    image: backend
+  frontend:
+    depends_on:
+      - "backend"
+    build:
+      context: ./client
+      dockerfile: ./Dockerfile
+      args:
+        - "NODE_ENV=${NODE_ENV}"
+        - "CLIENT_PORT=${CLIENT_PORT}"
+    ports:
+      - "${DOCKER_CLIENT_PORT_FORWARD}:${CLIENT_PORT}"
+    image: client
