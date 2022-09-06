@@ -20,9 +20,6 @@ module.exports = (server) => {
     const id = !Number.isNaN(parseID) ? parseID : -1;
     const data = req.body.changeData;
 
-    console.log(id, data);
-    console.log(req.body);
-
     if (id === -1 || !data)
       return res
         .status(400)
