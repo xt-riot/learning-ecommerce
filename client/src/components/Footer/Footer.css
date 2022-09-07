@@ -1,0 +1,23 @@
+.footer {
+    width: 100%;
+    color: white;
+    background-color: rgb(3, 9, 39);
+    bottom: 0;
+    position: absolute;
+}
+
+.dev {
+    min-width: 300px;
+}
+
+.bottom-footer {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+}
+
+.fa-github {
+    font-size: 25px;
+    cursor: pointer;
+}
