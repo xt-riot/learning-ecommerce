@@ -1,4 +1,5 @@
 const controller = require("../routes-controller/user.controller.js");
+const db = require("../database/dbFunctions.js");
 
 module.exports = (server) => {
   server.get("/", async (req, res, next) => {
@@ -20,9 +21,6 @@ module.exports = (server) => {
     const id = !Number.isNaN(parseID) ? parseID : -1;
     const data = req.body.changeData;
 
-    console.log(id, data);
-    console.log(req.body);
-
     if (id === -1 || !data)
       return res
         .status(400)
@@ -33,5 +31,20 @@ module.exports = (server) => {
       return res.status(400).json({ error: "Wrong changeData." });
 
     return res.json(response);
+  });
+
+  server.post("/addProduct", async (req, res, next) => {
+    try {
+      await db.Products.addProduct(
+        "Iphone 14",
+        "The newest Iphone in the market",
+        1088,
+        25,
+        "./public/assets/iphone14.png"
+      );
+    } catch (error) {
+      return res.status(error.statusCode).send(error.message);
+    }
+    console.log("running");
   });
 };
