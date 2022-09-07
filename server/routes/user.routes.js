@@ -35,16 +35,20 @@ module.exports = (server) => {
 
   server.post("/addProduct", async (req, res, next) => {
     try {
-      await db.Products.addProduct(
-        "Iphone 14",
-        "The newest Iphone in the market",
-        1088,
-        25,
-        "./public/assets/iphone14.png"
-      );
+      await db.Products.addProduct({
+        name: "Iphone 16",
+        desc: "The newest Iphone in the market",
+        price: 1088,
+        quantity: 25,
+        image: "./public/assets/iphone14.png",
+        color: "red",
+        category: "Mobile1",
+        size: "L",
+      });
     } catch (error) {
       return res.status(error.statusCode).send(error.message);
     }
     console.log("running");
+    res.json({ success: true });
   });
 };

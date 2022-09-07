@@ -1,0 +1,106 @@
+CREATE TABLE IF NOT EXISTS productColor (
+	id SERIAL PRIMARY KEY,
+	color TEXT
+);
+
+CREATE TABLE IF NOT EXISTS productSize (
+	id SERIAL PRIMARY KEY,
+	size varchar
+);
+
+CREATE TABLE IF NOT EXISTS productCategories (
+	id SERIAL PRIMARY KEY,
+	categoryName TEXT NOT NULL,
+	description TEXT
+);
+
+CREATE TABLE IF NOT EXISTS product (
+	id SERIAL PRIMARY KEY,
+	productName TEXT NOT NULL,
+	description TEXT,
+	weight float DEFAULT 0.00,
+	thumbnail varchar,
+	category_id INT NOT NULL,
+	CONSTRAINT fk_category FOREIGN KEY(category_id) REFERENCES productCategories(id)
+);
+
+CREATE TABLE IF NOT EXISTS product_options (
+	product_id INT NOT NULL REFERENCES product(id),
+	size_id INT NOT NULL REFERENCES productsize(id),
+	color_id INT NOT NULL REFERENCES productcolor(id),
+	quantity INT DEFAULT 0,
+	price float DEFAULT 0.00,
+	image varchar,
+	CONSTRAINT fk_product_option_key PRIMARY KEY(product_id, size_id, color_id)
+);
+
+INSERT INTO productsize (size) VALUES ('S');
+INSERT INTO productsize (size) VALUES ('M');
+INSERT INTO productsize (size) VALUES ('L');
+INSERT INTO productsize (size) VALUES ('XL');
+INSERT INTO productsize (size) VALUES ('XXL');
+select * from productsize;
+
+INSERT INTO productcolor (color) VALUES('red');
+INSERT INTO productcolor (color) VALUES('black');
+INSERT INTO productcolor (color) VALUES('blue');
+INSERT INTO productcolor (color) VALUES('white');
+select * from productcolor;
+
+INSERT INTO productcategories (categoryname, description)
+VALUES ('Mobile', 'Mobile phones');
+INSERT INTO productcategories (categoryname, description)
+VALUES ('Tablet', 'The best tablets');
+INSERT INTO productcategories (categoryname, description)
+VALUES ('Smart device', 'From smart watches to smart homes, all connected to your phone.');
+INSERT INTO productcategories (categoryname, description)
+VALUES ('PC', 'Latest hardware for your PC');
+select * from productcategories;
+
+
+INSERT INTO product (productname, description, category_id)
+VALUES ('Iphone 14', 'The newest iphone in the market', 1);
+INSERT INTO product (productname, description, category_id)
+VALUES ('Iphone 14 Pro', 'The newest iphone in the market', 1);
+INSERT INTO product (productname, description, category_id)
+VALUES ('Iphone 14 Pro Max', 'The newest iphone in the market', 1);
+INSERT INTO product (productname, description, category_id)
+VALUES ('Asus GTX 3090', 'The best GPU in the market', 4);
+select * from product;
+
+INSERT INTO product_options (product_id, size_id, color_id)
+VALUES (1, 1, 1);
+INSERT INTO product_options (product_id, size_id, color_id)
+VALUES (1, 1, 1);
+INSERT INTO product_options (product_id, size_id, color_id)
+VALUES (1, 1, 1);
+INSERT INTO product_options (product_id, size_id, color_id)
+VALUES (1, 1, 1);
+INSERT INTO product_options (product_id, size_id, color_id)
+VALUES (1, 1, 1);
+INSERT INTO product_options (product_id, size_id, color_id)
+VALUES (1, 1, 1);
+INSERT INTO product_options (product_id, size_id, color_id)
+VALUES (1, 1, 1);
+INSERT INTO product_options (product_id, size_id, color_id)
+VALUES (1, 1, 1);
+INSERT INTO product_options (product_id, size_id, color_id)
+VALUES (1, 1, 1);
+INSERT INTO product_options (product_id, size_id, color_id)
+VALUES (1, 1, 1);
+INSERT INTO product_options (product_id, size_id, color_id)
+VALUES (1, 1, 1);
+INSERT INTO product_options (product_id, size_id, color_id)
+VALUES (1, 1, 1);
+INSERT INTO product_options (product_id, size_id, color_id)
+VALUES (4, 7);
+select * from product_options;
+
+select product.productname, product.description, productcategories.categoryname, productoptions.price, productoptions.quantity, productsize.size, productcolor.color
+from product
+inner join product_options ON product_options.product_id = product.id
+inner join productcategories ON product.category_id = productcategories.id
+inner join productoptions ON product_options.option_id = productoptions.id
+inner join productsize ON productoptions.size_id = productsize.id
+inner join productcolor ON productoptions.color_id = productcolor.id
+WHERE product.productname = 'Iphone 14'
