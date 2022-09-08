@@ -42,8 +42,8 @@ module.exports = (server) => {
         quantity: 25,
         image: "./public/assets/iphone14.png",
         color: "black",
-        category: "Mobile1",
-        size: "XXXL",
+        category: "Mobile",
+        size: "XXL",
       });
 
       res.json(response);
@@ -53,7 +53,7 @@ module.exports = (server) => {
   });
 
   server.post("/addSize", async (req, res, next) => {
-    const size = "XXXL";
+    const size = "XXL";
     try {
       const response = await db.Products.addSize(size);
 
@@ -64,7 +64,7 @@ module.exports = (server) => {
   });
 
   server.post("/addColor", async (req, res, next) => {
-    const color = "white";
+    const color = "black";
     try {
       const response = await db.Products.addColor(color);
 
@@ -75,7 +75,7 @@ module.exports = (server) => {
   });
 
   server.post("/addCategory", async (req, res, next) => {
-    const category = "Mobile1";
+    const category = "Mobile";
     try {
       const response = await db.Products.addCategory(category);
 

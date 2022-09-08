@@ -161,20 +161,37 @@ const Products = {
       const connection = await db.pool.connect();
       let productHolder = await findProduct(connection, {
         name: product?.name,
-        color: color,
-        size: size,
-        category: category,
       });
 
-      if (productHolder !== undefined)
+      if (productHolder === undefined) {
+        productHolder = await connection.query(
+          `INSERT INTO product (productname, description, category_id)
+            VALUES ('${product.name}', '${product.desc}', ${category})
+            RETURNING id;`
+        );
+      }
+
+      const product_id = productHolder?.id || productHolder?.rows[0].id;
+      let response = await connection.query(
+        `SELECT product.productname, product.description, productcategories.categoryname, productcategories.description, color, size, price, quantity, image
+        FROM product_options
+        INNER JOIN product ON product.id = ${product_id} AND product_options.color_id = ${color} AND product_options.size_id = ${size}
+        INNER JOIN productcolor ON productcolor.id = ${color}
+        INNER JOIN productsize ON productsize.id = ${size}
+        INNER JOIN productcategories ON productcategories.id = product.category_id;`
+      );
+
+      console.log(response.rows, size, color);
+
+      if (response?.rows[0] !== undefined) {
         throw {
           statusCode: 400,
-          message: `Product '${product.name}' with those options already exists. Try updating it instead of creating a new one.`,
+          message: `Product ${product?.name} already exists with those options. Please try updating the existing configuration.`,
         };
+      }
 
       productHolder = await createProduct(connection, {
-        name: product?.name,
-        desc: product?.desc,
+        id: product_id,
         color: color,
         size: size,
         category: category,

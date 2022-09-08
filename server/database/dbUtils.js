@@ -88,33 +88,14 @@ const findSize = async (connection, size) => {
 };
 
 const createProduct = async (connection, product) => {
-  if (
-    !product?.name ||
-    !product?.desc ||
-    !product?.category ||
-    !product?.color ||
-    !product?.size
-  )
+  if (!product?.id || !product?.category || !product?.color || !product?.size)
     throw `Missing product information. Please contact an administrator.`;
-
-  // Create a new product
-  const productResponse = await connection.query(
-    `INSERT INTO product (productname, description, category_id)
-    VALUES ('${product.name}', '${product.desc}', ${product.category})
-    RETURNING id;`
-  );
-
-  console.log(productResponse);
-
-  // Could not create the product
-  if (!productResponse.rows[0]?.id)
-    throw `Could not create a new product. Please contact an administrator.`;
 
   // Create a new entry in the table that holds all the associations.
   const optionsResponse = await connection.query(
     `INSERT INTO product_options (product_id, size_id, color_id, quantity, price)
-    VALUES (${productResponse.rows[0].id}, ${product.size}, ${product.color}, ${product.quantity}, ${product.price})
-    RETURNING *;`
+    VALUES (${product.id}, ${product.size}, ${product.color}, ${product?.quantity}, ${product?.price})
+    RETURNING product_id, size_id, color_id;`
   );
 
   // Could not create the associations.
@@ -140,19 +121,11 @@ const createProduct = async (connection, product) => {
 };
 
 const findProduct = async (connection, product) => {
-  if (!product?.name || !product?.category) throw `Missing product information`;
+  if (!product?.name) throw `Missing product information`;
 
   const response = await connection.query(
-    `SELECT product.id, product.productname, product.description, categoryname, productcategories.description, color, size, price, quantity, image
+    `SELECT product.id, product.productname, product.description
     FROM product
-    INNER JOIN product_options ON product.id = product_options.product_id ${
-      product?.size ? `AND product_options.size_id = ${product?.size}` : ``
-    } ${
-      product?.color ? `AND product_options.color_id = ${product?.color}` : ``
-    }
-    INNER JOIN productcolor ON productcolor.id = product_options.color_id
-    INNER JOIN productsize ON productsize.id = product_options.size_id
-    INNER JOIN productcategories ON productcategories.id = product.category_id
     WHERE productname = '${product.name}';`
   );
 
