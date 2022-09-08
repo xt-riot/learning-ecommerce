@@ -1,15 +1,52 @@
 :root {
+  font-size: 16px;
+  line-height: 24px;
+  font-weight: 400;
   box-sizing: border-box;
   padding: 0;
-  margin:0;
+  margin: 0;
   max-height: 100%;
   font-family: 'Montserrat', sans-serif;
+  --background: rgb(240, 241, 244);
+  --text-primary: #ffffff;
+  --navbar-color: linear-gradient(
+    98deg,
+    rgb(121, 106, 255) 0%,
+    rgb(59, 54, 150) 100%
+  );
+  --navbar-second: rgb(59, 54, 150);
+  --topnav-color: #000000;
+  --footer-color: rgb(3, 9, 39);
+  --button-color: red;
+  --item-hover: #6d76f7;
+  --menu-active: rgb(121, 106, 255);
+  --signup: #80d0cc;
+}
+
+[data-theme='dark'] {
+  --background: rgb(240, 241, 244);
+  --text-primary: #ffffff;
+  --navbar-color: linear-gradient(
+    98deg,
+    rgb(121, 106, 255) 0%,
+    rgb(59, 54, 150) 100%
+  );
+  --navbar-second: rgb(59, 54, 150);
+  --topnav-color: #000000;
+  --footer-color: rgb(3, 9, 39);
+  --button-color: red;
+  --item-hover: #6d76f7;
+  --menu-active: rgb(121, 106, 255);
+  --signup: #80d0cc;
+  transition: all 0.2s ease-out;
 }
 
 body,
 body::before,
 body::after {
-    display: flex;
-    justify-content: center;
-    align-items: center;
+  background-color: var(--background);
+  display: flex;
+  min-width: 320px;
+  min-height: 100vh;
+  margin: 0;
 }

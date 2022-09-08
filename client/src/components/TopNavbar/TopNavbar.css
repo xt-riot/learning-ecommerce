@@ -1,15 +1,53 @@
 .topNavbar {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  color: var(--topnav-color);
+}
+
+.fa-cart-shopping {
+  position: absolute;
+  font-size: 14px;
+  cursor: pointer;
+  left: 94%;
+}
+
+.fa-bag-shopping {
+  position: absolute;
+  font-size: 14px;
+  cursor: pointer;
+  left: 97%;
+}
+
+.top-text {
+  margin: auto;
+}
+
+@media screen and (max-width: 700px) {
+  .topNavbar {
     display: flex;
     justify-content: center;
     align-items: center;
     width: 100%;
-}
+  }
 
-.fa {
-    margin-right: 20px;
+  .fa-cart-shopping {
+    position: absolute;
+    font-size: 14px;
     cursor: pointer;
-}
+    left: 90%;
+  }
 
-.top-text {
-    margin: auto;
+  .fa-bag-shopping {
+    position: absolute;
+    font-size: 14px;
+    cursor: pointer;
+    left: 95%;
+  }
+
+  .top-text {
+    font-size: 14px;
+    margin: 0 auto;
+  }
 }
