@@ -1,111 +1,196 @@
 const db = require("./db.js");
-const { findCategory, findColor, findSize } = require("./dbUtils.js");
-
-const productMapper = [
-  "name",
-  "desc",
-  "category",
-  "color",
-  "price",
-  "quantity",
-  "image",
-];
-const productMapperTypes = ["string", "string", "number", "number", "string"];
+const {
+  findCategory,
+  findColor,
+  findSize,
+  findProduct,
+  createCategory,
+  createColor,
+  createSize,
+  createProduct,
+} = require("./dbUtils.js");
 
 const Products = {
-  addProduct: async function (product) {
-    // if (args.length !== productMapper.length)
-    //   throw { statusCode: 400, message: "Missing product information." };
-
-    // const areValidTypes = args
-    //   .map((item, index) => {
-    //     if (typeof item === productMapperTypes[index] || Array.isArray(item))
-    //       return true;
-
-    //     return false;
-    //   })
-    //   .reduce((acc, item) => item && acc, true);
-
-    // if (!areValidTypes)
-    //   throw { statusCode: 400, message: "Invalid type of data provided." };
+  getSizes: async function () {
     try {
       const connection = await db.pool.connect();
+      const response = await connection.query(`SELECT size FROM productsize`);
 
-      const name = await connection.query(
-        `SELECT id FROM product WHERE productname = '${product.name}';`
+      return response.rows.reduce((acc, size) => [...acc, size], []);
+    } catch (e) {
+      throw {
+        statusCode: 500,
+        message: e,
+      };
+    }
+  },
+  getSize: async function (size) {
+    try {
+      const connection = await db.pool.connect();
+      const response = await findSize(connection, { name: size });
+
+      return response;
+    } catch (e) {
+      throw {
+        statusCode: e.statusCode || 500,
+        message: e.message,
+      };
+    }
+  },
+  addSize: async function (size) {
+    try {
+      const response = await this.getSize(size);
+      if (response?.statusCode === 404) {
+        const connection = await db.pool.connect();
+        const response = await createSize(connection, { name: size });
+
+        return response;
+      }
+
+      throw { statusCode: 400, message: `Size already exists.` };
+    } catch (e) {
+      throw e;
+    }
+  },
+  getColors: async function () {
+    try {
+      const connection = await db.pool.connect();
+      const response = await connection.query(`SELECT color FROM productcolor`);
+
+      return response.rows.reduce((acc, color) => [...acc, color], []);
+    } catch (e) {
+      throw {
+        statusCode: 500,
+        message: e,
+      };
+    }
+  },
+  getColor: async function (color) {
+    try {
+      const connection = await db.pool.connect();
+      const response = await findColor(connection, { name: color });
+
+      return response;
+    } catch (e) {
+      throw {
+        statusCode: e.statusCode || 500,
+        message: e.message,
+      };
+    }
+  },
+  addColor: async function (color) {
+    const response = await this.getColor(color);
+    if (response?.statusCode === 404) {
+      const connection = await db.pool.connect();
+      const response = await createColor(connection, { name: color });
+
+      return response;
+    }
+
+    throw { statusCode: 400, message: `Color already exists.` };
+  },
+  getCategories: async function () {
+    try {
+      const connection = await db.pool.connect();
+      const response = await connection.query(
+        `SELECT categoryname, description FROM productcategories`
       );
-      if (name.rowCount !== 0)
-        throw `Product '${product.name}' already exists. Try updating it instead of creating a new one.`;
 
-      const category = await findCategory(connection, {
-        name: product?.category,
-        description: product?.categoryDescription || "",
-        createNew: product?.createNewCategory || false,
+      return response.rows.reduce((acc, category) => [...acc, category], []);
+    } catch (e) {
+      throw {
+        statusCode: 500,
+        message: e,
+      };
+    }
+  },
+  getCategory: async function (category) {
+    try {
+      const connection = await db.pool.connect();
+      const response = await findCategory(connection, { name: category });
+
+      return response;
+    } catch (e) {
+      throw {
+        statusCode: e.statusCode || 500,
+        message: e.message,
+      };
+    }
+  },
+  addCategory: async function (category) {
+    const response = await this.getCategory(category);
+    if (response?.statusCode === 404) {
+      const connection = await db.pool.connect();
+      const response = await createCategory(connection, { name: category });
+
+      return response;
+    }
+
+    throw { statusCode: 400, message: `Category already exists.` };
+  },
+  addProduct: async function (product) {
+    try {
+      // FIND COLOR OR CREATE A NEW ONE --------------------------------------
+      let color = await this.getColor(product?.color);
+
+      if (color?.statusCode === 404)
+        throw {
+          statusCode: 404,
+          message: `Color '${product?.color}' not found. Please create the color to add the product.`,
+        };
+
+      // FIND SIZE OR CREATE A NEW ONE --------------------------------------
+      let size = await this.getSize(product?.size);
+
+      if (size?.statusCode === 404)
+        throw {
+          statusCode: 404,
+          message: `Size '${product?.size}' not found. Please create the size to add the product.`,
+        };
+
+      // FIND CATEGORY OR CREATE A NEW ONE --------------------------------------
+      let category = await this.getCategory(product?.category);
+
+      if (category?.statusCode === 404) {
+        throw {
+          statusCode: 404,
+          message: `Category '${product?.category}' not found. Please create the category to add the product.`,
+        };
+      }
+
+      const connection = await db.pool.connect();
+      let productHolder = await findProduct(connection, {
+        name: product?.name,
+        color: color,
+        size: size,
+        category: category,
       });
 
-      console.log(category);
+      if (productHolder !== undefined)
+        throw {
+          statusCode: 400,
+          message: `Product '${product.name}' with those options already exists. Try updating it instead of creating a new one.`,
+        };
 
-      const color = await findColor(connection, {
-        name: product?.color,
-        createNew: product?.createNewColor || false,
+      productHolder = await createProduct(connection, {
+        name: product?.name,
+        desc: product?.desc,
+        color: color,
+        size: size,
+        category: category,
+        quantity: product?.quantity,
+        price: product?.price,
+        image: product?.image,
       });
-      console.log(color);
 
-      const size = await findSize(connection, {
-        name: product?.size,
-        createNew: product?.createNewSize || false,
-      });
-      console.log(size);
-      //   const color = await connection.query(
-      //     `SELECT id FROM productcolor WHERE color = '${product.color}';`
-      //   );
-      //   if (color.rowCount === 0)
-      //     throw `Color '${product.color}' doesn't exist. Create one before trying to create a new product.`;
-
-      //   const size = await connection.query(
-      //     `SELECT id FROM productsize WHERE size = '${product.size}'`
-      //   );
-      //   if (size.rowCount === 0)
-      //     throw `Size '${product.size}' doesn't exist. Create one before trying to create a new product.`;
-
-      //   const createOption = await connection.query(
-      //     `INSERT INTO productoptions (color_id, size_id) VALUES (${color.rows[0].id}, ${size.rows[0].id});`
-      //   );
-      //   const option = await connection.query(
-      //     `INSERT INTO productoptions (color_id, size_id) VALUES (${color.rows[0].id}, ${size.rows[0].id});
-      //         ON CONFLICT DO NOTHING RETURNING id`
-      //   );
-      //   if (option.rowCount === 0) throw `Failed to add the product.`;
-
-      //   const createProduct = await connection.query(
-      //     `INSERT INTO product (productname, description, category_id) VALUES ('${product.name}', '${product.desc}', ${category.rows[0].id})`
-      //   );
-
-      //   console.log(option);
-
-      //   const query = `INSERT INTO product_options (product_id, option_id)
-      //                     VALUES (${createProduct.rows[0].id}, ${option.rows[0].id})
-      //                  `;
+      return productHolder;
     } catch (e) {
       console.log(e);
       throw {
-        statusCode: 500,
-        message: `Something went wrong with the database.`,
+        statusCode: e.statusCode || 500,
+        message: e,
       };
     }
-
-    // try {
-    //   const connection = await db.pool.connect();
-    //   const query = `select * from product where productname = ${name}`;
-    //   const response = await connection.query(query);
-    //   console.log(response.rows);
-    // } catch (e) {
-    //   console.log(e);
-    //   throw {
-    //     statusCode: 500,
-    //     message: `Something went wrong with the database.`,
-    //   };
-    // }
   },
 };
 

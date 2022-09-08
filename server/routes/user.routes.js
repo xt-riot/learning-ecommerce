@@ -35,20 +35,55 @@ module.exports = (server) => {
 
   server.post("/addProduct", async (req, res, next) => {
     try {
-      await db.Products.addProduct({
-        name: "Iphone 16",
+      const response = await db.Products.addProduct({
+        name: "Iphone 9",
         desc: "The newest Iphone in the market",
         price: 1088,
         quantity: 25,
         image: "./public/assets/iphone14.png",
-        color: "red",
+        color: "black",
         category: "Mobile1",
-        size: "L",
+        size: "XXXL",
       });
+
+      res.json(response);
     } catch (error) {
-      return res.status(error.statusCode).send(error.message);
+      return res.status(error.statusCode || 500).send(error.message);
     }
-    console.log("running");
-    res.json({ success: true });
+  });
+
+  server.post("/addSize", async (req, res, next) => {
+    const size = "XXXL";
+    try {
+      const response = await db.Products.addSize(size);
+
+      return res.status(200).json(`Successfully created size '${size}'`);
+    } catch (e) {
+      return res.status(e.statusCode || 500).json(e.message);
+    }
+  });
+
+  server.post("/addColor", async (req, res, next) => {
+    const color = "white";
+    try {
+      const response = await db.Products.addColor(color);
+
+      return res.status(200).json(`Successfully created color '${color}'`);
+    } catch (e) {
+      return res.status(e.statusCode || 500).json(e.message);
+    }
+  });
+
+  server.post("/addCategory", async (req, res, next) => {
+    const category = "Mobile1";
+    try {
+      const response = await db.Products.addCategory(category);
+
+      return res
+        .status(200)
+        .json(`Successfully created category '${category}'`);
+    } catch (e) {
+      return res.status(e.statusCode || 500).json(e.message);
+    }
   });
 };
