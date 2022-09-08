@@ -35,53 +35,49 @@ module.exports = (server) => {
 
   server.post("/addProduct", async (req, res, next) => {
     try {
-      const response = await db.Products.addProduct({
-        name: "Iphone 9",
-        desc: "The newest Iphone in the market",
-        price: 1088,
-        quantity: 25,
-        image: "./public/assets/iphone14.png",
-        color: "black",
-        category: "Mobile",
-        size: "XXL",
-      });
+      const response = await controller.addProduct(req.body);
 
-      res.json(response);
+      res.status(200).json(response);
     } catch (error) {
       return res.status(error.statusCode || 500).send(error.message);
     }
   });
 
   server.post("/addSize", async (req, res, next) => {
-    const size = "XXL";
     try {
-      const response = await db.Products.addSize(size);
+      const response = await controller.addSize(req.body);
 
-      return res.status(200).json(`Successfully created size '${size}'`);
+      return res
+        .status(200)
+        .json(`Successfully created size '${req.body.size}'`);
     } catch (e) {
       return res.status(e.statusCode || 500).json(e.message);
     }
   });
 
   server.post("/addColor", async (req, res, next) => {
-    const color = "black";
     try {
-      const response = await db.Products.addColor(color);
+      const response = await controller.addColor(req.body);
 
-      return res.status(200).json(`Successfully created color '${color}'`);
+      return res
+        .status(200)
+        .json(`Successfully created color '${req.body.color}'`);
     } catch (e) {
       return res.status(e.statusCode || 500).json(e.message);
     }
   });
 
   server.post("/addCategory", async (req, res, next) => {
-    const category = "Mobile";
     try {
-      const response = await db.Products.addCategory(category);
+      const response = await controller.addCategory(req.body);
 
       return res
         .status(200)
-        .json(`Successfully created category '${category}'`);
+        .json(
+          `Successfully created category '${
+            req.body.category.name || req.body.category
+          }'`
+        );
     } catch (e) {
       return res.status(e.statusCode || 500).json(e.message);
     }

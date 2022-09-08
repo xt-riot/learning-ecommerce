@@ -1,5 +1,6 @@
 const createCategory = async (connection, category) => {
-  if (!category?.name) throw `Missing category information`;
+  if (!category?.name && category.name !== undefined)
+    throw `Missing category information`;
 
   const response = await connection.query(
     `INSERT INTO productcategories (categoryname, description) 
@@ -13,7 +14,8 @@ const createCategory = async (connection, category) => {
 };
 
 const findCategory = async (connection, category) => {
-  if (!category?.name) throw `Please specify a category`;
+  if (!category?.name && category.name !== undefined)
+    throw `Please specify a category`;
 
   const response = await connection.query(
     `SELECT id FROM productcategories WHERE categoryname = '${category.name}';`
@@ -30,7 +32,7 @@ const findCategory = async (connection, category) => {
 };
 
 const createColor = async (connection, color) => {
-  if (!color?.name) throw `Please specify a color`;
+  if (!color?.name && color.name !== undefined) throw `Please specify a color`;
 
   const response = await connection.query(`INSERT INTO productcolor (color) 
       VALUES ('${color.name}') RETURNING id;`);
@@ -41,7 +43,7 @@ const createColor = async (connection, color) => {
   return response.rows[0].id;
 };
 const findColor = async (connection, color) => {
-  if (!color?.name) throw `Please specify a color`;
+  if (!color?.name && color.name !== undefined) throw `Please specify a color`;
 
   const response = await connection.query(
     `SELECT id FROM productcolor WHERE color = '${color.name}';`
@@ -59,7 +61,7 @@ const findColor = async (connection, color) => {
 };
 
 const createSize = async (connection, size) => {
-  if (!size?.name) throw `Please specify a size`;
+  if (!size?.name && size.name !== undefined) throw `Please specify a size`;
 
   const response = await connection.query(`INSERT INTO productsize (size) 
   VALUES ('${size.name}') RETURNING id;`);
@@ -71,7 +73,7 @@ const createSize = async (connection, size) => {
 };
 
 const findSize = async (connection, size) => {
-  if (!size?.name) throw `Please specify a size`;
+  if (!size?.name && size.name !== undefined) throw `Please specify a size`;
 
   const response = await connection.query(
     `SELECT id FROM productsize WHERE size = '${size.name}';`

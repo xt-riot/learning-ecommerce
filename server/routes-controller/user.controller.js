@@ -1,11 +1,13 @@
+const db = require("../database/dbFunctions.js");
+
 const productMapper = [
-  "id",
   "name",
   "desc",
   "price",
   "quantity",
-  "image",
+  "category",
   "color",
+  "size",
 ];
 const dummyProducts = {
   products: [
@@ -57,4 +59,59 @@ exports.changeProduct = (id, data) => {
   return dummyProducts.products[product];
 };
 
-//{"id": 0, "changeData": {"name": "hello", "test":"hacked"}}
+exports.addProduct = async (product) => {
+  if (product === undefined) {
+    throw {
+      statusCode: 400,
+      message: "Missing required information about product.",
+    };
+  }
+  const dataKeys = Object.keys(product);
+  const isDataValid = dataKeys
+    .map((key) => productMapper.includes(key))
+    .reduce((acc, item) => item && acc, true);
+
+  if (!isDataValid) return -1;
+
+  return await db.Products.addProduct(product);
+  //{"name":"Iphone 11", "desc":"Iphone for dums", "quantity": 15, "price": 1000, "category":"Mobile", "color":"red"}
+};
+
+exports.addSize = async ({ size }) => {
+  if (size === undefined || typeof size !== "string") {
+    throw {
+      statusCode: 400,
+      message: "Missing required information about size.",
+    };
+  }
+
+  return await db.Products.addSize(size);
+};
+
+exports.addColor = async ({ color: color }) => {
+  if (color === undefined || typeof color !== "string") {
+    throw {
+      statusCode: 400,
+      message: "Missing required information about color.",
+    };
+  }
+
+  return await db.Products.addColor(color);
+};
+
+exports.addCategory = async ({ category }) => {
+  if (
+    category === undefined ||
+    (typeof category !== "string" && typeof category !== "object")
+  ) {
+    throw {
+      statusCode: 400,
+      message: "Missing required information about category.",
+    };
+  }
+
+  return await db.Products.addCategory({
+    name: category.name || category,
+    description: category.description || "",
+  });
+};

@@ -118,10 +118,13 @@ const Products = {
     }
   },
   addCategory: async function (category) {
-    const response = await this.getCategory(category);
+    const response = await this.getCategory(category.name || category);
     if (response?.statusCode === 404) {
       const connection = await db.pool.connect();
-      const response = await createCategory(connection, { name: category });
+      const response = await createCategory(connection, {
+        name: category.name || category,
+        description: category.description || "",
+      });
 
       return response;
     }
@@ -136,7 +139,9 @@ const Products = {
       if (color?.statusCode === 404)
         throw {
           statusCode: 404,
-          message: `Color '${product?.color}' not found. Please create the color to add the product.`,
+          message: `Color '${
+            product?.color ?? "NOT_SPECIFIED"
+          }' not found. Please create the color to add the product.`,
         };
 
       // FIND SIZE OR CREATE A NEW ONE --------------------------------------
@@ -145,7 +150,9 @@ const Products = {
       if (size?.statusCode === 404)
         throw {
           statusCode: 404,
-          message: `Size '${product?.size}' not found. Please create the size to add the product.`,
+          message: `Size '${
+            product?.size ?? "NOT_SPECIFIED"
+          }' not found. Please create the size to add the product.`,
         };
 
       // FIND CATEGORY OR CREATE A NEW ONE --------------------------------------
@@ -181,8 +188,6 @@ const Products = {
         INNER JOIN productcategories ON productcategories.id = product.category_id;`
       );
 
-      console.log(response.rows, size, color);
-
       if (response?.rows[0] !== undefined) {
         throw {
           statusCode: 400,
@@ -202,7 +207,6 @@ const Products = {
 
       return productHolder;
     } catch (e) {
-      console.log(e);
       throw {
         statusCode: e.statusCode || 500,
         message: e,
