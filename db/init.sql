@@ -10,16 +10,15 @@ CREATE TABLE IF NOT EXISTS productSize (
 
 CREATE TABLE IF NOT EXISTS productCategories (
 	id SERIAL PRIMARY KEY,
-	categoryName TEXT NOT NULL,
-	description TEXT
+	categoryName TEXT NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS product (
 	id SERIAL PRIMARY KEY,
 	productName TEXT NOT NULL,
-	description TEXT,
-	weight float DEFAULT 0.00,
+	productDescription TEXT,
 	thumbnail varchar,
+	material TEXT NOT NULL,
 	category_id INT NOT NULL,
 	CONSTRAINT fk_category FOREIGN KEY(category_id) REFERENCES productCategories(id)
 );
