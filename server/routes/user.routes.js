@@ -52,6 +52,7 @@ module.exports = (server) => {
         .status(200)
         .json(`Successfully created size '${req.body.size}'`);
     } catch (e) {
+      console.log(e);
       return res.status(e.statusCode || 500).json(e.message);
     }
   });
