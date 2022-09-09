@@ -1,36 +1,5 @@
 const db = require("../database/dbFunctions.js");
 
-const productMapper = [
-  "name",
-  "desc",
-  "price",
-  "quantity",
-  "category",
-  "color",
-  "size",
-];
-const dummyProducts = {
-  products: [
-    {
-      id: 0,
-      name: "",
-      desc: "",
-      price: 0,
-      quantity: 0,
-      image: "/public/images/asd.png",
-      color: ["black", "white", "red"],
-    },
-    {
-      id: 1,
-      name: "",
-      desc: "",
-      price: 0,
-      quantity: 0,
-      image: "/public/images/asd.png",
-      color: ["black", "white", "red"],
-    },
-  ],
-};
 exports.indexPage = () => {
   return { statusCode: 200, data: "<h1>Index page</h1>" };
 };
@@ -39,21 +8,18 @@ exports.findProduct = async (query) => {
   const parseID = parseInt(query?.id, 10);
   const id = !Number.isNaN(parseID) ? parseID : -1;
 
+  const lim = parseInt(query?.limit, 10);
+  const limit = !Number.isNaN(lim) ? (lim < 101 ? lim : 10) : 10; // TODO: do we need to throw or inform the client he can't search for more than 100 items at once?
+
   const page = parseInt(query?.p, 10);
   const pagination = !Number.isNaN(page) ? page : 0;
-
-  const lim = parseInt(query?.limit, 10);
-  const limit = !Number.isNaN(lim) ? limit : 10;
 
   const name = query.name || null;
 
   if (id === -1 && !name) {
-    const response = await db.Products.getProducts(
-      limit < 101 ? limit : 10,
-      pagination
-    );
+    const response = await db.Products.getProducts(limit, pagination * limit);
 
-    return response;
+    return { products: response, pagination: pagination + 1, limit: limit };
   }
 
   const response = await db.Products.getProduct({
@@ -64,23 +30,34 @@ exports.findProduct = async (query) => {
   return response;
 };
 
-exports.changeProduct = (id, data) => {
-  let product = dummyProducts.products.findIndex(
-    (product) => product.id === id
-  );
-  const dataKeys = Object.keys(data);
-  const isDataValid = dataKeys
-    .map((key) => productMapper.includes(key))
-    .reduce((acc, item) => item && acc, true);
+// TODO: Implement this
 
-  if (!isDataValid) return -1;
+// const productMapper = [
+//   "name",
+//   "desc",
+//   "price",
+//   "quantity",
+//   "category",
+//   "color",
+//   "size",
+// ];
+// exports.changeProduct = (id, data) => {
+//   let product = dummyProducts.products.findIndex(
+//     (product) => product.id === id
+//   );
+//   const dataKeys = Object.keys(data);
+//   const isDataValid = dataKeys
+//     .map((key) => productMapper.includes(key))
+//     .reduce((acc, item) => item && acc, true);
 
-  dummyProducts.products[product] = {
-    ...dummyProducts.products[product],
-    ...data,
-  };
-  return dummyProducts.products[product];
-};
+//   if (!isDataValid) return -1;
+
+//   dummyProducts.products[product] = {
+//     ...dummyProducts.products[product],
+//     ...data,
+//   };
+//   return dummyProducts.products[product];
+// };
 
 exports.addProduct = async (product) => {
   if (product === undefined) {
@@ -97,7 +74,6 @@ exports.addProduct = async (product) => {
   if (!isDataValid) return -1;
 
   return await db.Products.addProduct(product);
-  //{"name":"Iphone 11", "desc":"Iphone for dums", "quantity": 15, "price": 1000, "category":"Mobile", "color":"red"}
 };
 
 exports.addSize = async ({ size }) => {
