@@ -213,6 +213,36 @@ const Products = {
       };
     }
   },
+  getProducts: async function (limit = 10, offset = 0) {
+    try {
+      const connection = await db.pool.connect();
+
+      const response = await findProduct(connection, {
+        id: null,
+        name: null,
+        limit: limit,
+        offset: offset,
+      });
+
+      return response;
+    } catch (e) {
+      throw { statusCode: e.statusCode || 500, message: e.message };
+    }
+  },
+  getProduct: async function (product) {
+    try {
+      const connection = await db.pool.connect();
+
+      const response = await findProduct(connection, {
+        id: product.id || -1,
+        name: product.name || "",
+      });
+
+      return response;
+    } catch (e) {
+      throw { statusCode: e.statusCode || 500, message: e.message };
+    }
+  },
 };
 
 const Users = {

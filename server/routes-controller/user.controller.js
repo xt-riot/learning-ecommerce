@@ -35,10 +35,33 @@ exports.indexPage = () => {
   return { statusCode: 200, data: "<h1>Index page</h1>" };
 };
 
-exports.findProduct = (id) => {
-  if (id === -1) return dummyProducts;
+exports.findProduct = async (query) => {
+  const parseID = parseInt(query?.id, 10);
+  const id = !Number.isNaN(parseID) ? parseID : -1;
 
-  return dummyProducts.products[id];
+  const page = parseInt(query?.p, 10);
+  const pagination = !Number.isNaN(page) ? page : 0;
+
+  const lim = parseInt(query?.limit, 10);
+  const limit = !Number.isNaN(lim) ? limit : 10;
+
+  const name = query.name || null;
+
+  if (id === -1 && !name) {
+    const response = await db.Products.getProducts(
+      limit < 101 ? limit : 10,
+      pagination
+    );
+
+    return response;
+  }
+
+  const response = await db.Products.getProduct({
+    id: id,
+    name: name?.replace(/"/g, "").replace(/\s\s+/g, " ").trim() || "",
+  });
+
+  return response;
 };
 
 exports.changeProduct = (id, data) => {
@@ -114,4 +137,22 @@ exports.addCategory = async ({ category }) => {
     name: category.name || category,
     description: category.description || "",
   });
+};
+
+exports.getCategories = async () => {
+  const response = await db.Products.getCategories();
+
+  return response;
+};
+
+exports.getColors = async () => {
+  const response = await db.Products.getColors();
+
+  return response;
+};
+
+exports.getSizes = async () => {
+  const response = await db.Products.getSizes();
+
+  return response;
 };

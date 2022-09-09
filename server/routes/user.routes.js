@@ -8,12 +8,13 @@ module.exports = (server) => {
   });
 
   server.get("/products", async (req, res, next) => {
-    const parseID = parseInt(req.query.id, 10);
-    const id = !Number.isNaN(parseID) ? parseID : -1;
+    try {
+      const response = await controller.findProduct(req.query);
 
-    const response = await controller.findProduct(id);
-
-    return res.json(response);
+      res.status(200).json(response);
+    } catch (error) {
+      return res.status(error.statusCode || 500).send(error.message);
+    }
   });
 
   server.post("/products", async (req, res, next) => {
@@ -78,6 +79,33 @@ module.exports = (server) => {
             req.body.category.name || req.body.category
           }'`
         );
+    } catch (e) {
+      return res.status(e.statusCode || 500).json(e.message);
+    }
+  });
+
+  server.get("/getCategories", async (req, res, next) => {
+    try {
+      const response = await controller.getCategories();
+      return res.status(200).json(response);
+    } catch (e) {
+      return res.status(e.statusCode || 500).json(e.message);
+    }
+  });
+
+  server.get("/getColors", async (req, res, next) => {
+    try {
+      const response = await controller.getColors();
+      return res.status(200).json(response);
+    } catch (e) {
+      return res.status(e.statusCode || 500).json(e.message);
+    }
+  });
+
+  server.get("/getSizes", async (req, res, next) => {
+    try {
+      const response = await controller.getSizes();
+      return res.status(200).json(response);
     } catch (e) {
       return res.status(e.statusCode || 500).json(e.message);
     }

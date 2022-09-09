@@ -123,13 +123,39 @@ const createProduct = async (connection, product) => {
 };
 
 const findProduct = async (connection, product) => {
-  if (!product?.name) throw `Missing product information`;
+  if (!product?.name && !product?.id && !product?.limit && !product?.pagination)
+    throw `Missing product information`;
 
+  // Request to serve all the products in the database.
+  if (!product.name && !product.id) {
+    const response = await connection.query(
+      `SELECT product.id, product.productname, product.description
+      FROM product
+      ORDER BY id
+      LIMIT ${product.limit} OFFSET ${product.offset}
+      ;`
+    );
+    return response.rows;
+  }
+
+  // If it wasn't for the whole database, find the corresponding product
   const response = await connection.query(
     `SELECT product.id, product.productname, product.description
-    FROM product
-    WHERE productname = '${product.name}';`
+      FROM product
+      WHERE ${
+        product.id !== -1
+          ? `id = ${product.id}`
+          : `productname = '${product.name}'`
+      };`
   );
+
+  if (response.rows[0] === undefined)
+    throw {
+      statusCode: 404,
+      message: `Product with ${
+        product.name ? `name '${product.name}'` : `id '${product.id}'`
+      } does not exist.`,
+    };
 
   return response.rows[0];
 };
