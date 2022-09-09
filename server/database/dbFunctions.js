@@ -8,6 +8,8 @@ const {
   createColor,
   createSize,
   createProduct,
+  findOption,
+  createOption,
 } = require("./dbUtils.js");
 
 const Products = {
@@ -169,35 +171,34 @@ const Products = {
 
       const connection = await db.pool.connect();
       let productHolder = await findProduct(connection, {
-        name: product?.name,
+        name: product.name,
       });
 
       if (productHolder === undefined) {
-        productHolder = await connection.query(
-          `INSERT INTO products (productName, productDescription, categoryID, material)
-            VALUES ('${product.name}', '${product.desc}', ${category}, '${product.material}')
-            RETURNING id;`
-        );
+        productHolder = await createProduct(connection, {
+          name: product.name,
+          desc: product.desc,
+          category: category,
+          material: product.material,
+        });
       }
 
-      const product_id = productHolder?.id || productHolder?.rows[0].id;
-      let response = await connection.query(
-        `SELECT productName, productDescription, product_categories.categoryName, color, size, price, quantity, material, thumbnail, image
-        FROM product_options
-        INNER JOIN products ON product.id = ${product_id} AND product_options.color_id = ${color} AND product_options.size_id = ${size}
-        INNER JOIN product_colors ON product_colors.id = ${color}
-        INNER JOIN product_sizes ON product_sizes.id = ${size}
-        INNER JOIN product_categories ON product_categories.id = product.categoryID;`
-      );
-
-      if (response?.rows[0] !== undefined) {
+      const productConfigurationAlreadyExists = await findOption(connection, {
+        id: product_id,
+        name: product.name,
+        color: color,
+        size: size,
+        category: category,
+        image: product.image,
+      });
+      if (productConfigurationAlreadyExists !== undefined) {
         throw {
           statusCode: 400,
           message: `Product ${product?.name} already exists with those options. Please try updating the existing configuration.`,
         };
       }
 
-      productHolder = await createProduct(connection, {
+      const response = await createOption(connection, {
         id: product_id,
         color: color,
         size: size,
@@ -207,7 +208,7 @@ const Products = {
         image: product?.image,
       });
 
-      return productHolder;
+      return response;
     } catch (e) {
       throw {
         statusCode: e.statusCode || 500,
@@ -232,6 +233,7 @@ const Products = {
     }
   },
   getProduct: async function (product) {
+    if (!product?.name && !product?.id) throw `Missing product information`;
     try {
       const connection = await db.pool.connect();
 

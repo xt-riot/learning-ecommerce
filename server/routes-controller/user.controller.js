@@ -43,17 +43,14 @@ exports.findProduct = async (query) => {
   const pagination = !Number.isNaN(page) ? page : 0;
 
   const lim = parseInt(query?.limit, 10);
-  const limit = !Number.isNaN(lim) ? limit : 10;
+  const limit = !Number.isNaN(lim) ? (lim < 101 ? lim : 10) : 10; // TODO: do we need to throw or inform the client he can't search for more than 100 items at once?
 
   const name = query.name || null;
 
   if (id === -1 && !name) {
-    const response = await db.Products.getProducts(
-      limit < 101 ? limit : 10,
-      pagination
-    );
+    const response = await db.Products.getProducts(limit, pagination);
 
-    return response;
+    return { products: response, pagination: pagination + limit, limit: limit };
   }
 
   const response = await db.Products.getProduct({

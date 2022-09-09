@@ -90,73 +90,105 @@ const findSize = async (connection, size) => {
 };
 
 const createProduct = async (connection, product) => {
-  if (!product?.id || !product?.category || !product?.color || !product?.size)
+  if (!product.name && !product.desc && !product.category && !product.material)
     throw `Missing product information. Please contact an administrator.`;
 
-  // Create a new entry in the table that holds all the associations.
-  const optionsResponse = await connection.query(
-    `INSERT INTO product_options (productID, sizeID, colorID, quantity, price)
-    VALUES (${product.id}, ${product.size}, ${product.color}, ${product?.quantity}, ${product?.price})
-    RETURNING product_id, size_id, color_id;`
+  const creatingProduct = await connection.query(
+    `INSERT INTO products (product_name, product_description, category_id, material)
+      VALUES ('${product.name}', '${product.desc}', ${category}, '${product.material}')
+      RETURNING id;`
   );
 
-  // Could not create the associations.
-  if (!optionsResponse.rows[0]?.product_id)
-    throw `Could not create a new product. Please contact an administrator.`;
+  return creatingProduct.rows[0];
 
-  // Get all the values we need.
-  const response = await connection.query(
-    `select productName, productDescription, categoryName, color, size, price, material, quantity, thumbnail, image
-    from product_options
-    INNER JOIN product ON product.id = ${optionsResponse.rows[0].product_id}
-    INNER JOIN product_colors ON product_colors.id = ${optionsResponse.rows[0].color_id}
-    INNER JOIN product_sizes ON product_sizes.id = ${optionsResponse.rows[0].size_id}
-    INNER JOIN product_categories ON product_categories.id = product.categoryID;
-    INNER JOIN product_images ON product_images.id = product.imageID`
-  );
+  // // Create a new entry in the table that holds all the associations.
+  // const optionsResponse = await this.createOption(connection, product);
 
-  // Could not get the values.
-  if (response.rowCount === 0)
-    throw `Something went wrong. Please contact an administrator.`;
+  // // Could not create the associations.
+  // if (!optionsResponse.product_id)
+  //   throw `Could not create a new product. Please contact an administrator.`;
 
-  // Return the values
-  return response.rows[0];
+  // // Get all the values we need.
+  // const response = await connection.query(
+  //   `select product_name, product_description, categoryName, color, size, price, material, quantity, thumbnail, image
+  //   from product_options
+  //   INNER JOIN product ON product.id = ${optionsResponse.rows[0].product_id}
+  //   INNER JOIN product_colors ON product_colors.id = ${optionsResponse.rows[0].color_id}
+  //   INNER JOIN product_sizes ON product_sizes.id = ${optionsResponse.rows[0].size_id}
+  //   INNER JOIN product_categories ON product_categories.id = product.category_id;
+  //   INNER JOIN product_images ON product_images.id = product.image_id`
+  // );
+
+  // // Could not get the values.
+  // if (response.rowCount === 0)
+  //   throw `Something went wrong. Please contact an administrator.`;
+
+  // // Return the values
+  // return response.rows[0];
 };
 
 const findProduct = async (connection, product) => {
-  if (!product?.name && !product?.id && !product?.limit && !product?.pagination)
-    throw `Missing product information`;
-
-  // Request to serve all the products in the database.
-  if (!product.name && !product.id) {
+  console.log(product);
+  if (product.name || product.id) {
     const response = await connection.query(
-      `SELECT id, productName, productDescription, material
+      `SELECT id, product_name, product_description, material
+        FROM products
+        WHERE ${
+          product.id !== -1
+            ? `id = ${product.id}`
+            : `product_name = '${product.name}'`
+        };`
+    );
+
+    return response.rows[0];
+  }
+
+  const response = await connection.query(
+    `SELECT id, product_name, product_description, material
       FROM products
       ORDER BY id
       LIMIT ${product.limit} OFFSET ${product.offset}
       ;`
-    );
-    return response.rows;
-  }
+  );
+  return response.rows;
+};
 
-  // If it wasn't for the whole database, find the corresponding product
-  const response = await connection.query(
-    `SELECT id, productName, productDescription, material
-      FROM products
-      WHERE ${
-        product.id !== -1
-          ? `id = ${product.id}`
-          : `productname = '${product.name}'`
-      };`
+const createOption = async (connection, product) => {
+  if (!product.id && !product.size_id && !product.color_id)
+    throw `Missing product information. Please contact an administrator.`;
+
+  const optionsResponse = await connection.query(
+    `INSERT INTO product_options (product_id, size_id, color_id, quantity, price)
+    VALUES (${product.id}, ${product.size}, ${product.color}, ${product?.quantity}, ${product?.price})
+    RETURNING product_id, size_id, color_id;`
   );
 
-  if (response.rows[0] === undefined)
-    throw {
-      statusCode: 404,
-      message: `Product with ${
-        product.name ? `name '${product.name}'` : `id '${product.id}'`
-      } does not exist.`,
-    };
+  return optionsResponse.rows[0];
+};
+
+const findOption = async (connection, data) => {
+  if (!data?.product_name || !data?.product_description || !data?.image_id)
+    throw `Missing product information. Please contact an administrator.`;
+
+  const response = await connection.query(
+    `SELECT product_name, product_description, product_categories.categoryName, color, size, price, quantity, material, thumbnail, image
+    FROM product_options
+    INNER JOIN products ON product.product_name = ${
+      data.product_name
+    } OR product.id = ${data.id}
+    INNER JOIN product_colors ON product_colors.id = ${
+      data.color ?? "product_options.color_id"
+    }
+    INNER JOIN product_sizes ON product_sizes.id = ${
+      data.size ?? "product_options.size_id"
+    }
+    INNER JOIN product_categories ON product_categories.id = ${
+      data.category ?? "product.category_id"
+    }
+    INNER JOIN product_images ON product_images.id = ${
+      data.image ?? "product.image_id"
+    };`
+  );
 
   return response.rows[0];
 };
@@ -170,4 +202,6 @@ module.exports = {
   createSize,
   findProduct,
   createProduct,
+  findOption,
+  createOption,
 };
