@@ -3,8 +3,8 @@ const createCategory = async (connection, category) => {
     throw `Missing category information`;
 
   const response = await connection.query(
-    `INSERT INTO productcategories (categoryname, description) 
-    VALUES ('${category.name}', '${category.description}') RETURNING id;`
+    `INSERT INTO product_categories (categoryName) 
+    VALUES ('${category.name}') RETURNING id;`
   );
 
   if (!response.rows[0]?.id)
@@ -18,7 +18,7 @@ const findCategory = async (connection, category) => {
     throw `Please specify a category`;
 
   const response = await connection.query(
-    `SELECT id FROM productcategories WHERE categoryname = '${category.name}';`
+    `SELECT id FROM product_categories WHERE categoryName = '${category.name}';`
   );
 
   if (response.rowCount === 0) {
@@ -34,7 +34,7 @@ const findCategory = async (connection, category) => {
 const createColor = async (connection, color) => {
   if (!color?.name && color.name !== undefined) throw `Please specify a color`;
 
-  const response = await connection.query(`INSERT INTO productcolor (color) 
+  const response = await connection.query(`INSERT INTO product_colors (color) 
       VALUES ('${color.name}') RETURNING id;`);
 
   if (!response.rows[0]?.id)
@@ -46,7 +46,7 @@ const findColor = async (connection, color) => {
   if (!color?.name && color.name !== undefined) throw `Please specify a color`;
 
   const response = await connection.query(
-    `SELECT id FROM productcolor WHERE color = '${color.name}';`
+    `SELECT id FROM product_colors WHERE color = '${color.name}';`
   );
 
   // color doesnt exist. Return to the function that called me to decide the next step.
@@ -63,7 +63,7 @@ const findColor = async (connection, color) => {
 const createSize = async (connection, size) => {
   if (!size?.name && size.name !== undefined) throw `Please specify a size`;
 
-  const response = await connection.query(`INSERT INTO productsize (size) 
+  const response = await connection.query(`INSERT INTO product_sizes (size) 
   VALUES ('${size.name}') RETURNING id;`);
 
   if (!response.rows[0]?.id)
@@ -76,7 +76,7 @@ const findSize = async (connection, size) => {
   if (!size?.name && size.name !== undefined) throw `Please specify a size`;
 
   const response = await connection.query(
-    `SELECT id FROM productsize WHERE size = '${size.name}';`
+    `SELECT id FROM product_sizes WHERE size = '${size.name}';`
   );
 
   if (response.rowCount === 0) {
@@ -95,7 +95,7 @@ const createProduct = async (connection, product) => {
 
   // Create a new entry in the table that holds all the associations.
   const optionsResponse = await connection.query(
-    `INSERT INTO product_options (product_id, size_id, color_id, quantity, price)
+    `INSERT INTO product_options (productID, sizeID, colorID, quantity, price)
     VALUES (${product.id}, ${product.size}, ${product.color}, ${product?.quantity}, ${product?.price})
     RETURNING product_id, size_id, color_id;`
   );
@@ -106,12 +106,13 @@ const createProduct = async (connection, product) => {
 
   // Get all the values we need.
   const response = await connection.query(
-    `select product.productname, product.description, productcategories.categoryname, productcategories.description, color, size, price, quantity, image
+    `select productName, productDescription, categoryName, color, size, price, material, quantity, thumbnail, image
     from product_options
     INNER JOIN product ON product.id = ${optionsResponse.rows[0].product_id}
-    INNER JOIN productcolor ON productcolor.id = ${optionsResponse.rows[0].color_id}
-    INNER JOIN productsize ON productsize.id = ${optionsResponse.rows[0].size_id}
-    INNER JOIN productcategories ON productcategories.id = product.category_id;`
+    INNER JOIN product_colors ON product_colors.id = ${optionsResponse.rows[0].color_id}
+    INNER JOIN product_sizes ON product_sizes.id = ${optionsResponse.rows[0].size_id}
+    INNER JOIN product_categories ON product_categories.id = product.categoryID;
+    INNER JOIN product_images ON product_images.id = product.imageID`
   );
 
   // Could not get the values.
@@ -129,8 +130,8 @@ const findProduct = async (connection, product) => {
   // Request to serve all the products in the database.
   if (!product.name && !product.id) {
     const response = await connection.query(
-      `SELECT product.id, product.productname, product.description
-      FROM product
+      `SELECT id, productName, productDescription, material
+      FROM products
       ORDER BY id
       LIMIT ${product.limit} OFFSET ${product.offset}
       ;`
@@ -140,8 +141,8 @@ const findProduct = async (connection, product) => {
 
   // If it wasn't for the whole database, find the corresponding product
   const response = await connection.query(
-    `SELECT product.id, product.productname, product.description
-      FROM product
+    `SELECT id, productName, productDescription, material
+      FROM products
       WHERE ${
         product.id !== -1
           ? `id = ${product.id}`

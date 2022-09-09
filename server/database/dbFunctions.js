@@ -14,7 +14,7 @@ const Products = {
   getSizes: async function () {
     try {
       const connection = await db.pool.connect();
-      const response = await connection.query(`SELECT size FROM productsize`);
+      const response = await connection.query(`SELECT size FROM product_sizes`);
 
       return response.rows.reduce((acc, size) => [...acc, size], []);
     } catch (e) {
@@ -55,7 +55,9 @@ const Products = {
   getColors: async function () {
     try {
       const connection = await db.pool.connect();
-      const response = await connection.query(`SELECT color FROM productcolor`);
+      const response = await connection.query(
+        `SELECT color FROM product_colors`
+      );
 
       return response.rows.reduce((acc, color) => [...acc, color], []);
     } catch (e) {
@@ -93,7 +95,7 @@ const Products = {
     try {
       const connection = await db.pool.connect();
       const response = await connection.query(
-        `SELECT categoryname, description FROM productcategories`
+        `SELECT categoryName FROM product_categories`
       );
 
       return response.rows.reduce((acc, category) => [...acc, category], []);
@@ -172,20 +174,20 @@ const Products = {
 
       if (productHolder === undefined) {
         productHolder = await connection.query(
-          `INSERT INTO product (productname, description, category_id)
-            VALUES ('${product.name}', '${product.desc}', ${category})
+          `INSERT INTO products (productName, productDescription, categoryID, material)
+            VALUES ('${product.name}', '${product.desc}', ${category}, '${product.material}')
             RETURNING id;`
         );
       }
 
       const product_id = productHolder?.id || productHolder?.rows[0].id;
       let response = await connection.query(
-        `SELECT product.productname, product.description, productcategories.categoryname, productcategories.description, color, size, price, quantity, image
+        `SELECT productName, productDescription, product_categories.categoryName, color, size, price, quantity, material, thumbnail, image
         FROM product_options
-        INNER JOIN product ON product.id = ${product_id} AND product_options.color_id = ${color} AND product_options.size_id = ${size}
-        INNER JOIN productcolor ON productcolor.id = ${color}
-        INNER JOIN productsize ON productsize.id = ${size}
-        INNER JOIN productcategories ON productcategories.id = product.category_id;`
+        INNER JOIN products ON product.id = ${product_id} AND product_options.color_id = ${color} AND product_options.size_id = ${size}
+        INNER JOIN product_colors ON product_colors.id = ${color}
+        INNER JOIN product_sizes ON product_sizes.id = ${size}
+        INNER JOIN product_categories ON product_categories.id = product.categoryID;`
       );
 
       if (response?.rows[0] !== undefined) {
