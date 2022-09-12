@@ -51,7 +51,7 @@ const findColor = async (connection, color) => {
 
   // color doesnt exist. Return to the function that called me to decide the next step.
   if (response.rowCount === 0) {
-    return {
+    throw {
       statusCode: 404,
       message: "Color doesnt exist. Please create a new category.",
     };
@@ -104,17 +104,41 @@ const createProduct = async (connection, product) => {
 
 const findProduct = async (connection, product) => {
   if (product.name || product.id) {
+    let searchQuery;
+
+    if (product.name && (!product.id || product.id < 1)) {
+      searchQuery = `products.product_name = '${product.name}'`;
+    } else if (product?.id && (!product.name || product.name === "")) {
+      searchQuery = `products.id = ${product.id}`;
+    } else {
+      searchQuery = `products.product_name = '${product.name}' AND products.id = ${product.id}`;
+    }
+
     const response = await connection.query(
       `SELECT id, product_name, product_description, material
         FROM products
-        WHERE ${
-          product.id !== -1
-            ? `id = ${product.id}`
-            : `product_name = '${product.name}'`
-        };`
+        WHERE ${searchQuery};`
     );
 
+    if (response.rowCount === 0) {
+      throw {
+        statusCode: 400,
+        message: "Could not find the product with those parameters.",
+      };
+    }
+
     return response.rows[0];
+  }
+
+  const totalProducts = await connection.query(
+    `SELECT COUNT(id) AS total FROM products;`
+  );
+
+  if (totalProducts.rows[0].total < product.offset) {
+    throw {
+      statusCode: 400,
+      message: "Invalid parameters. Offset cannot exceed total products.",
+    };
   }
 
   const response = await connection.query(
@@ -141,30 +165,29 @@ const createOption = async (connection, product) => {
 };
 
 const findOption = async (connection, data) => {
-  if (!data?.product_name || !data?.product_description || !data?.image_id)
+  let searchQuery;
+  if (data.id && data.product_name) {
+    searchQuery = `product_options.product_id= ${data.id} AND products.product_name=${data.product_name}`;
+  } else if (data.id) {
+    searchQuery = `product_options.product_id= ${data.id}`;
+  } else if (data.product_name) {
+    searchQuery = `products.product_name=${data.product_name}`;
+  } else {
     throw `Missing product information. Please contact an administrator.`;
+  }
 
   const response = await connection.query(
-    `SELECT product_name, product_description, product_categories.categoryName, color, size, price, quantity, material, thumbnail, image
+    `SELECT products.id, product_name, product_description, product_categories.categoryName, color, size, price, quantity, material, thumbnail, image
     FROM product_options
-    INNER JOIN products ON product.product_name = ${
-      data.product_name
-    } OR product.id = ${data.id}
-    INNER JOIN product_colors ON product_colors.id = ${
-      data.color ?? "product_options.color_id"
-    }
-    INNER JOIN product_sizes ON product_sizes.id = ${
-      data.size ?? "product_options.size_id"
-    }
-    INNER JOIN product_categories ON product_categories.id = ${
-      data.category ?? "product.category_id"
-    }
-    INNER JOIN product_images ON product_images.id = ${
-      data.image ?? "product.image_id"
-    };`
+    INNER JOIN products ON products.id = product_options.product_id
+    INNER JOIN product_colors ON product_colors.id = product_options.color_id
+    INNER JOIN product_sizes ON product_sizes.id = product_options.size_id
+    INNER JOIN product_categories ON product_categories.id = products.category_id
+    INNER JOIN product_images ON product_images.id = products.image_id
+    WHERE ${searchQuery};`
   );
 
-  return response.rows[0];
+  return response.rows;
 };
 
 module.exports = {

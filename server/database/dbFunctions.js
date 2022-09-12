@@ -18,21 +18,31 @@ const Products = {
       const connection = await db.pool.connect();
       const response = await connection.query(`SELECT size FROM product_sizes`);
 
+      await connection.release(true);
       return response.rows.reduce((acc, size) => [...acc, size], []);
     } catch (e) {
+      await connection.release(true);
       throw {
         statusCode: 500,
         message: e,
       };
     }
   },
-  getSize: async function (size) {
+  getSize: async function ({ size = "" } = {}, ...args) {
+    if (args.length > 0 || size === "") {
+      throw {
+        statusCode: 400,
+        message: `Invalid parameters. Please contact an administrator.`,
+      };
+    }
+    const connection = await db.pool.connect();
     try {
-      const connection = await db.pool.connect();
       const response = await findSize(connection, { name: size });
 
+      await connection.release(true);
       return response;
     } catch (e) {
+      await connection.release(true);
       throw {
         statusCode: e.statusCode || 500,
         message: e.message,
@@ -55,27 +65,37 @@ const Products = {
     }
   },
   getColors: async function () {
+    const connection = await db.pool.connect();
     try {
-      const connection = await db.pool.connect();
       const response = await connection.query(
         `SELECT color FROM product_colors`
       );
 
+      await connection.release(true);
       return response.rows.reduce((acc, color) => [...acc, color], []);
     } catch (e) {
+      await connection.release(true);
       throw {
         statusCode: 500,
         message: e,
       };
     }
   },
-  getColor: async function (color) {
+  getColor: async function ({ color = "" } = {}, ...args) {
+    if (args.length > 0 || color === "") {
+      throw {
+        statusCode: 400,
+        message: `Invalid parameters. Please contact an administrator.`,
+      };
+    }
+    const connection = await db.pool.connect();
     try {
-      const connection = await db.pool.connect();
       const response = await findColor(connection, { name: color });
 
+      await connection.release(true);
       return response;
     } catch (e) {
+      await connection.release(true);
       throw {
         statusCode: e.statusCode || 500,
         message: e.message,
@@ -94,27 +114,37 @@ const Products = {
     throw { statusCode: 400, message: `Color already exists.` };
   },
   getCategories: async function () {
+    const connection = await db.pool.connect();
     try {
-      const connection = await db.pool.connect();
       const response = await connection.query(
         `SELECT categoryName FROM product_categories`
       );
 
+      await connection.release(true);
       return response.rows.reduce((acc, category) => [...acc, category], []);
     } catch (e) {
+      await connection.release(true);
       throw {
         statusCode: 500,
         message: e,
       };
     }
   },
-  getCategory: async function (category) {
+  getCategory: async function ({ category = "" } = {}, ...args) {
+    if (args.length > 0 || category === "") {
+      throw {
+        statusCode: 400,
+        message: `Invalid parameters. Please contact an administrator.`,
+      };
+    }
+    const connection = await db.pool.connect();
     try {
-      const connection = await db.pool.connect();
       const response = await findCategory(connection, { name: category });
 
+      await connection.release(true);
       return response;
     } catch (e) {
+      await connection.release(true);
       throw {
         statusCode: e.statusCode || 500,
         message: e.message,
@@ -213,34 +243,70 @@ const Products = {
       };
     }
   },
-  getProducts: async function (limit = 10, offset = 0) {
-    try {
-      const connection = await db.pool.connect();
+  getProducts: async function ({ limit = 10, offset = 0, ...args } = {}) {
+    const parsedLimit = parseInt(limit, 10);
+    const parsedOffset = parseInt(offset, 10);
 
+    if (
+      Number.isNaN(parsedLimit) ||
+      parsedLimit < 0 ||
+      Number.isNaN(parsedOffset) ||
+      parsedOffset < 0 ||
+      Object.keys(args).length > 0
+    ) {
+      throw { statusCode: 400, message: "Invalid parameters." };
+    }
+    const connection = await db.pool.connect();
+
+    try {
       const response = await findProduct(connection, {
         id: null,
         name: null,
-        limit: limit,
-        offset: offset,
+        limit: parsedLimit,
+        offset: parsedOffset,
       });
 
+      await connection.release(true);
       return response;
     } catch (e) {
+      await connection.release(true);
       throw { statusCode: e.statusCode || 500, message: e.message };
     }
   },
   getProduct: async function (product) {
-    if (!product?.name && !product?.id) throw `Missing product information`;
-    try {
-      const connection = await db.pool.connect();
+    if (!product?.name && !product?.id)
+      throw { statusCode: 400, message: `Missing product information` };
+    const connection = await db.pool.connect();
 
+    try {
       const response = await findProduct(connection, {
-        id: product.id || -1,
-        name: product.name || "",
+        id: product.id,
+        name: product.name,
       });
 
+      await connection.release(true);
       return response;
     } catch (e) {
+      await connection.release(true);
+      throw { statusCode: e.statusCode || 500, message: e.message };
+    }
+  },
+
+  getOption: async function (product) {
+    if (!product?.name && !product?.id)
+      throw { statusCode: 400, message: `Missing product information` };
+    const connection = await db.pool.connect();
+
+    try {
+      const response = await findOption(connection, {
+        id: product.id,
+        name: product.name,
+      });
+
+      await connection.release(true);
+      return response;
+    } catch (e) {
+      await connection.release(true);
       throw { statusCode: e.statusCode || 500, message: e.message };
     }
   },

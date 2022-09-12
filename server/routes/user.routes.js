@@ -107,9 +107,8 @@ module.exports = (server) => {
 
   server.get("/colors", async (req, res, next) => {
     try {
-      const response = (await controller.getColors()).map((color) => {
-        return { name: color };
-      });
+      const response = await controller.getColors();
+
       return res.status(200).json({ colors: response });
     } catch (e) {
       return res.status(e.statusCode || 500).json(e.message);
@@ -119,7 +118,7 @@ module.exports = (server) => {
   server.get("/sizes", async (req, res, next) => {
     try {
       const response = (await controller.getSizes()).map((size) => {
-        return { name: size.size };
+        return { size: size.size };
       });
       return res.status(200).json({ sizes: response });
     } catch (e) {

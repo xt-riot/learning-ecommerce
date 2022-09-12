@@ -19,7 +19,33 @@ exports.findProduct = async (query) => {
   if (id === -1 && !name) {
     const response = await db.Products.getProducts(limit, pagination * limit);
 
-    return { products: response, pagination: pagination + 1, limit: limit };
+    let products = await Promise.all(
+      response.map(async (product) => {
+        return await db.Products.getOption({
+          id: product.id,
+          name: product.product_name,
+        });
+      })
+    );
+
+    products = products.map((product) => {
+      return product.reduce(
+        (acc, item) => {
+          return {
+            ...acc,
+            ...item,
+            color: [...acc.color, item.color],
+            size: [...acc.size, item.size],
+            price: [...acc.price, item.price],
+            quantity: [...acc.quantity, item.quantity],
+          };
+        },
+        { color: [], size: [], price: [], quantity: [] }
+      );
+    });
+    // console.log(products);
+
+    return { products: products, pagination: pagination + 1, limit: limit };
   }
 
   const response = await db.Products.getProduct({
@@ -27,7 +53,26 @@ exports.findProduct = async (query) => {
     name: name?.replace(/"/g, "").replace(/\s\s+/g, " ").trim() || "",
   });
 
-  return response;
+  let product = await db.Products.getOption({
+    id: response.id,
+    name: response.product_name,
+  });
+
+  product = product.reduce(
+    (acc, item) => {
+      return {
+        ...acc,
+        ...item,
+        color: [...acc.color, item.color],
+        size: [...acc.size, item.size],
+        price: [...acc.price, item.price],
+        quantity: [...acc.quantity, item.quantity],
+      };
+    },
+    { color: [], size: [], price: [], quantity: [] }
+  );
+
+  return product;
 };
 
 // TODO: Implement this

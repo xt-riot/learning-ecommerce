@@ -13,6 +13,10 @@ var environment = process.env.NODE_ENV || "development";
 var port = process.env.NODE_PORT || 1337;
 
 server.use(async (req, res, next) => {
+  if (process.env.NODE_ENV === "test") {
+    await next();
+    return;
+  }
   const start = Date.now();
   await next();
   const duration = Date.now() - start;
@@ -35,12 +39,4 @@ server.use(express.static("public"));
 
 require("./routes/user.routes.js")(server);
 
-server.listen(port, () => {
-  console.log(
-    "Server Listening - http://localhost:" +
-      port +
-      ". " +
-      environment +
-      " environment"
-  );
-});
+module.exports = server;

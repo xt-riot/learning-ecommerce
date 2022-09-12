@@ -1,7 +1,8 @@
 version: '3.8'
+
 services:
-  db:
-    container_name: postgreSQL
+  test_db:
+    container_name: test_db
     image: postgres:14.5-alpine
     restart: always
     environment:
@@ -9,10 +10,9 @@ services:
       - POSTGRES_PASSWORD=${DATABASE_PASSWORD}
       - POSTGRES_DB=${DATABASE_NAME}
     ports:
-      - "${DATABASE_PORT}:5432"
+      - "1001:5432"
     volumes:
-      - data:/var/lib/postgresql/data
+      - dbtest:/var/lib/postgresql/data
       - ./db/init.sql:/docker-entrypoint-initdb.d/create_tables.sql
 volumes:
-  data: {}
   dbtest: {}
