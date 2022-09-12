@@ -1,4 +1,4 @@
-:root {
+:root, [data-theme='light'] {
   font-size: 16px;
   line-height: 24px;
   font-weight: 400;
@@ -19,12 +19,13 @@
   --footer-color: rgb(3, 9, 39);
   --button-color: red;
   --item-hover: #6d76f7;
+  --subitem-hover: #8d94f9;
   --menu-active: rgb(121, 106, 255);
   --signup: #80d0cc;
 }
 
 [data-theme='dark'] {
-  --background: rgb(240, 241, 244);
+  --background: rgb(3, 9, 39);
   --text-primary: #ffffff;
   --navbar-color: linear-gradient(
     98deg,
@@ -32,13 +33,14 @@
     rgb(59, 54, 150) 100%
   );
   --navbar-second: rgb(59, 54, 150);
-  --topnav-color: #000000;
+  --topnav-color: #ffffff;
   --footer-color: rgb(3, 9, 39);
+  --footer-text: #ffffff;
   --button-color: red;
   --item-hover: #6d76f7;
+  --subitem-hover: #8d94f9;
   --menu-active: rgb(121, 106, 255);
   --signup: #80d0cc;
-  transition: all 0.2s ease-out;
 }
 
 body,

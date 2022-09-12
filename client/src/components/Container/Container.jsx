@@ -3,6 +3,7 @@ import TopNavbar from '../TopNavbar/TopNavbar';
 import Navbar from '../Navbar/Navbar';
 import Footer from '../Footer/Footer';
 import './Container.css';
+import Products from '../Navbar/Products';
 
 export default class Container extends Component {
   constructor(props) {
@@ -13,9 +14,15 @@ export default class Container extends Component {
   }
 
   switchTheme = () => {
-    this.setState({
-      theme: this.state.theme ? 'dark' : 'light',
-    });
+    if (this.state.theme === 'light') {
+      this.setState({
+        theme: 'dark',
+      });
+    } else {
+      this.setState({
+        theme: 'light',
+      });
+    }
     console.log(this.state.theme);
   };
 

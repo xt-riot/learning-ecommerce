@@ -1,9 +1,13 @@
 import React, { Component } from 'react';
-import Profile from './Profile';
-import Products from './Products';
-import Services from './Services';
-import Contact from './Contact';
+import Dropdown from './Dropdown';
 import { MenuButton } from './MenuButton';
+// import { Link } from 'react-router-dom';
+// import Profile from './Profile';
+// import Products from './Products';
+// import Services from './Services';
+// import Contact from './Contact';
+// import { MenuButton } from './MenuButton';
+import { navItems } from '../../data';
 import './Navbar.css';
 
 export default class Navbar extends Component {
@@ -12,6 +16,7 @@ export default class Navbar extends Component {
     this.state = {
       clicked: false,
       search: '',
+      dropdown: false,
     };
   }
 
@@ -23,6 +28,22 @@ export default class Navbar extends Component {
     this.setState({
       search: e.target.value,
     });
+  };
+
+  onMouseEnter = () => {
+    if (this.state.dropdown === false) {
+      this.setState({
+        dropdown: true,
+      });
+    }
+  };
+
+  onMouseLeave = () => {
+    if (this.state.dropdown === true) {
+      this.setState({
+        dropdown: false,
+      });
+    }
   };
 
   render() {
@@ -67,18 +88,26 @@ export default class Navbar extends Component {
           ></i>
         </div>
         <ul className={this.state.clicked ? 'nav-menu active' : 'nav-menu'}>
-          <li className='menuItem'>
-            <Profile />
-          </li>
-          <li className='menuItem'>
-            <Products />
-          </li>
-          <li className='menuItem'>
-            <Services />
-          </li>
-          <li className='menuItem'>
-            <Contact />
-          </li>
+          {navItems.map((item) => {
+            if (item.title === 'Products') {
+              return (
+                <li
+                  key={item.id}
+                  className={item.cName}
+                  onMouseEnter={this.onMouseEnter}
+                  onMouseLeave={this.onMouseLeave}
+                >
+                  {item.title}
+                  {<Dropdown dropdown={this.state.dropdown} />}
+                </li>
+              );
+            }
+            return (
+              <li key={item.id} className={item.cName}>
+                {item.title}
+              </li>
+            );
+          })}
           <li className='menuItem'>
             <MenuButton>Sign Up</MenuButton>
           </li>
