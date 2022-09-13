@@ -79,6 +79,7 @@ module.exports = (server) => {
     }
   });
 
+
   server.post("/categories", async (req, res, next) => {
     try {
       const response = await controller.addCategory(req.body);
