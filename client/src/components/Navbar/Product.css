@@ -1,6 +1,12 @@
-.x {
+.qntyContainer {
     display: flex;
-    flex-direction: column;
-    justify-content: center;
+    justify-content: space-around;
     align-items: center;
+}
+
+.quantity {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    gap: 10px;
 }

@@ -1,24 +1,33 @@
 import React, { Component } from 'react';
-import { Card } from '@mui/material';
+import { Card, Button } from '@mui/material';
 import './Product.css';
-import {
-  CardContent,
-  CardMedia,
-  Typography,
-  CardActionArea,
-} from '@mui/material';
+import { CardContent, CardMedia, Typography } from '@mui/material';
 
 export default class Product extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      product: this.props.item,
+    };
+  }
+  handleIncrement = () => {
+    console.log('+');
+  };
+
+  handleDecrement = () => {
+    console.log('-');
+  };
+
   render() {
     return (
       <div>
         <Card sx={{ maxWidth: 345 }}>
-          <CardActionArea>
+          <Card sx={{ bgcolor: '#cfd8dc' }}>
             <CardMedia
               component='img'
-              height='250'
-              image='/static/images/cards/contemplative-reptile.jpg'
-              alt='green iguana'
+              height='400'
+              image={this.props.img}
+              alt='This is an item image.'
             />
             <CardContent>
               <Typography
@@ -36,7 +45,50 @@ export default class Product extends Component {
                 {this.props.desc}
               </Typography>
             </CardContent>
-          </CardActionArea>
+            <Typography>
+              <div className='qntyContainer'>
+                <div className='quantity'>
+                  <span>{this.props.quantity}</span>
+                  <div className='btn-grp'>
+                    <Button
+                      onClick={() => {
+                        this.props.onIncrement(this.state.product, 10);
+                      }}
+                      variant='outlined'
+                      style={{
+                        fontSize: '14px',
+                        padding: '3px',
+                      }}
+                      className='plus'
+                    >
+                      +
+                    </Button>
+                    <Button
+                      onClick={() => {
+                        this.props.onDecrement(this.state.product, 0);
+                      }}
+                      variant='outlined'
+                      style={{
+                        fontSize: '14px',
+                        padding: '3px',
+                      }}
+                      className='plus'
+                    >
+                      -
+                    </Button>
+                  </div>
+                </div>
+                <Button
+                  style={{
+                    fontSize: '12px',
+                  }}
+                  variant='contained'
+                >
+                  Add to cart
+                </Button>
+              </div>
+            </Typography>
+          </Card>
         </Card>
       </div>
     );
