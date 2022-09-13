@@ -92,6 +92,45 @@ describe("GET endpoints", () => {
     );
   });
 
+  it("should throw an error -- wrong parameters: id=-1", async () => {
+    expect.assertions(2);
+    const response = await request(app).get("/products?id=-1");
+
+    expect(response.statusCode).toEqual(400);
+    expect(response.body.message).toEqual(
+      "Could not find the product with those parameters."
+    );
+  });
+
+  it("should throw an error -- wrong parameters: name='asdasd'", async () => {
+    expect.assertions(2);
+    const response = await request(app).get('/products?name="asdasd"');
+    expect(response.statusCode).toEqual(400);
+    expect(response.body.message).toEqual(
+      "Could not find the product with those parameters."
+    );
+  });
+
+  it("should throw an error -- wrong parameters: id=9, name='asdasd'", async () => {
+    expect.assertions(2);
+    const response = await request(app).get(
+      '/products?id=9&name="Awesome Granite Fish"'
+    );
+    expect(response.statusCode).toEqual(400);
+    expect(response.body.message).toEqual(
+      "Could not find the product with those parameters."
+    );
+  });
+
+  it('should throw an error -- wrong parameters: id=-1, name="Awesome Granite Fish"', async () => {
+    expect.assertions(2);
+    const response = await request(app).get('/products?id=-1&name="asdasd"');
+    expect(response.statusCode).toEqual(400);
+    expect(response.body.message).toEqual(
+      "Could not find the product with those parameters."
+    );
+  });
+
   it("should return all the categories -- /categories", async () => {
     const response = await request(app).get("/categories");
 

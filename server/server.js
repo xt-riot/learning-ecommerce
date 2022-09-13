@@ -5,12 +5,10 @@ const bodyParser = require("body-parser");
 const cors = require("cors");
 
 const server = express();
-var corsOptions = {
-  origin: "http://localhost:5173",
-  "Access-Control-Allow-Origin": "*",
-};
-var environment = process.env.NODE_ENV || "development";
-var port = process.env.NODE_PORT || 1337;
+// var corsOptions = {
+//   origin: "http://localhost:5173",
+//   "Access-Control-Allow-Origin": "*",
+// };
 
 server.use(async (req, res, next) => {
   if (process.env.NODE_ENV === "test") {

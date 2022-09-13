@@ -4,7 +4,7 @@ require("dotenv").config({
   path: `${path.resolve(__dirname, "../../../.env")}`,
 });
 
-const dbFunctions = require("../../database/dbFunctions.js");
+const Products = require("../../database/dbProduct.js");
 
 const product = {
   product_name: expect.any(String),
@@ -15,7 +15,7 @@ const product = {
 
 const getProduct_Test = describe("getProduct function", () => {
   it("parameters: {id}", async () => {
-    const response = await dbFunctions.Products.getProduct({ id: 11 });
+    const response = await Products.getProduct({ id: 11 });
 
     expect(response).toStrictEqual({
       ...product,
@@ -25,7 +25,7 @@ const getProduct_Test = describe("getProduct function", () => {
   });
 
   it("parameters: {name}", async () => {
-    const response = await dbFunctions.Products.getProduct({
+    const response = await Products.getProduct({
       name: "Unbranded Fresh Fish",
     });
 
@@ -37,7 +37,7 @@ const getProduct_Test = describe("getProduct function", () => {
   });
 
   it("parameters: {id, name}", async () => {
-    const response = await dbFunctions.Products.getProduct({
+    const response = await Products.getProduct({
       id: 11,
       name: "Unbranded Fresh Fish",
     });
@@ -53,7 +53,7 @@ const getProduct_Test = describe("getProduct function", () => {
     expect.assertions(1);
 
     try {
-      await dbFunctions.Products.getProduct({ test: "WHATEVER" });
+      await Products.getProduct({ test: "WHATEVER" });
     } catch (e) {
       expect(e).toEqual({
         statusCode: 400,
@@ -63,57 +63,50 @@ const getProduct_Test = describe("getProduct function", () => {
   });
 
   it("parameters: {id, name} -- incorrect parameters(id points to different product from name) -- THROWS ERROR", async () => {
-    expect.assertions(1);
+    expect.assertions(2);
+    const response = await Products.getProduct({
+      id: 9,
+      name: "Unbranded Fresh Fish",
+    });
 
-    try {
-      await dbFunctions.Products.getProduct({
-        id: 9,
-        name: "Unbranded Fresh Fish",
-      });
-    } catch (e) {
-      expect(e).toEqual({
-        statusCode: 400,
-        message: expect.any(String),
-      });
-    }
+    expect(response.statusCode).toEqual(400);
+    expect(response.message).toEqual(
+      "Could not find the product with those parameters."
+    );
   });
 
   it("parameters: {id, name} -- incorrect parameters(id points to different product from name) -- THROWS ERROR", async () => {
-    expect.assertions(1);
+    expect.assertions(2);
 
-    try {
-      await dbFunctions.Products.getProduct({
-        id: 11,
-        name: "1231",
-      });
-    } catch (e) {
-      expect(e).toEqual({
-        statusCode: 400,
-        message: expect.any(String),
-      });
-    }
+    const response = await Products.getProduct({
+      id: 11,
+      name: "1231",
+    });
+
+    expect(response.statusCode).toEqual(400);
+    expect(response.message).toEqual(
+      "Could not find the product with those parameters."
+    );
   });
 
   it("parameters: {id, name} -- wrong id(id is out of range) -- THROWS ERROR", async () => {
-    expect.assertions(1);
+    expect.assertions(2);
 
-    try {
-      await dbFunctions.Products.getProduct({
-        id: -1,
-      });
-    } catch (e) {
-      expect(e).toEqual({
-        statusCode: 400,
-        message: expect.any(String),
-      });
-    }
+    const response = await Products.getProduct({
+      id: -1,
+    });
+
+    expect(response.statusCode).toEqual(400);
+    expect(response.message).toEqual(
+      "Could not find the product with those parameters."
+    );
   });
 
   it("parameters: {test} -- search product with faulty parameters -- THROWS ERROR", async () => {
     expect.assertions(1);
 
     try {
-      await dbFunctions.Products.getProduct({ test: "WHATEVER" });
+      await Products.getProduct({ test: "WHATEVER" });
     } catch (e) {
       expect(e).toEqual({
         statusCode: 400,

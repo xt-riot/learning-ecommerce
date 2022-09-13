@@ -4,7 +4,7 @@ require("dotenv").config({
   path: `${path.resolve(__dirname, "../../../.env")}`,
 });
 
-const dbFunctions = require("../../database/dbFunctions.js");
+const Category = require("../../database/dbCategory.js");
 
 const categories = {
   categoryname: expect.any(String),
@@ -12,7 +12,7 @@ const categories = {
 
 describe("getCategories function", () => {
   it("no parameters", async () => {
-    const response = await dbFunctions.Products.getCategories();
+    const response = await Category.getCategories();
 
     expect(response).toBeInstanceOf(Array);
 
@@ -22,7 +22,7 @@ describe("getCategories function", () => {
   });
 
   it("faulty parameters", async () => {
-    const response = await dbFunctions.Products.getCategories({
+    const response = await Category.getCategories({
       test: "WHATEVER",
     });
 
@@ -37,8 +37,8 @@ describe("getCategories function", () => {
 describe("getCategory function", () => {
   it("parameter: category = Ergonomic", async () => {
     const category = "Ergonomic";
-    const response = await dbFunctions.Products.getCategory({
-      category: category,
+    const response = await Category.getCategory({
+      name: category,
     });
 
     expect(response).toEqual(expect.any(Number));
@@ -48,7 +48,7 @@ describe("getCategory function", () => {
     expect.assertions(1);
 
     try {
-      await dbFunctions.Products.getCategory();
+      await Category.getCategory();
     } catch (e) {
       expect(e).toEqual({ statusCode: 400, message: expect.any(String) });
     }
@@ -58,7 +58,7 @@ describe("getCategory function", () => {
     expect.assertions(1);
 
     try {
-      await dbFunctions.Products.getCategory({ test: "WHATEVER" });
+      await Category.getCategory({ test: "WHATEVER" });
     } catch (e) {
       expect(e).toEqual({ statusCode: 400, message: expect.any(String) });
     }

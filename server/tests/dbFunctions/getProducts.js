@@ -4,7 +4,7 @@ require("dotenv").config({
   path: `${path.resolve(__dirname, "../../../.env")}`,
 });
 
-const dbFunctions = require("../../database/dbFunctions.js");
+const Products = require("../../database/dbProduct.js");
 
 const product = {
   product_name: expect.any(String),
@@ -15,7 +15,7 @@ const product = {
 
 describe("getProducts function", () => {
   it("no parameters", async () => {
-    const response = await dbFunctions.Products.getProducts();
+    const response = await Products.getProducts();
 
     expect(response).toBeInstanceOf(Array);
 
@@ -28,7 +28,7 @@ describe("getProducts function", () => {
 
   it("parameters: limit = 20", async () => {
     const limit = 20;
-    const response = await dbFunctions.Products.getProducts({ limit: limit });
+    const response = await Products.getProducts({ limit: limit });
 
     expect(response).toBeInstanceOf(Array);
     expect(response.length).toEqual(limit);
@@ -42,7 +42,7 @@ describe("getProducts function", () => {
 
   it("parameters: offset = 20", async () => {
     const offset = 20;
-    const response = await dbFunctions.Products.getProducts({ offset: offset });
+    const response = await Products.getProducts({ offset: offset });
 
     expect(response).toBeInstanceOf(Array);
     expect(response[0].id).toEqual(offset + 1);
@@ -57,7 +57,7 @@ describe("getProducts function", () => {
   it("parameters: limit = 20, offset = 20", async () => {
     const offset = 20;
     const limit = 20;
-    const response = await dbFunctions.Products.getProducts({
+    const response = await Products.getProducts({
       limit: limit,
       offset: offset,
     });
@@ -77,7 +77,7 @@ describe("getProducts function", () => {
     expect.assertions(1);
 
     try {
-      await dbFunctions.Products.getProducts({
+      await Products.getProducts({
         test: "WHATEVER",
       });
     } catch (e) {
@@ -94,7 +94,7 @@ describe("getProducts function", () => {
     const limit = -1;
 
     try {
-      await dbFunctions.Products.getProducts({
+      await Products.getProducts({
         limit: limit,
         offset: offset,
       });
@@ -112,7 +112,7 @@ describe("getProducts function", () => {
     const limit = -1;
 
     try {
-      await dbFunctions.Products.getProducts({
+      await Products.getProducts({
         limit: limit,
         offset: offset,
       });
@@ -130,7 +130,7 @@ describe("getProducts function", () => {
     const limit = 25;
 
     try {
-      await dbFunctions.Products.getProducts({
+      await Products.getProducts({
         limit: limit,
         offset: offset,
       });
@@ -148,7 +148,7 @@ describe("getProducts function", () => {
     const limit = 25;
 
     try {
-      await dbFunctions.Products.getProducts({
+      await Products.getProducts({
         limit: limit,
         offset: offset,
       });

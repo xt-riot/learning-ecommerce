@@ -1,0 +1,155 @@
+const {
+  findProduct,
+  createProduct,
+  findOption,
+  createOption,
+} = require("./dbUtils.js");
+
+const Color = require("./dbColor.js");
+const Size = require("./dbSize.js");
+const Category = require("./dbCategory.js");
+
+const Products = {
+  addProduct: async function (product) {
+    try {
+      let color = await Color.getColor({ color: product?.color });
+
+      if (color?.statusCode === 404)
+        throw {
+          statusCode: 404,
+          message: `Color '${
+            product?.color ?? "NOT_SPECIFIED"
+          }' not found. Please create the color to add the product.`,
+        };
+
+      let size = await Size.getSize({ size: product?.size });
+
+      if (size?.statusCode === 404)
+        throw {
+          statusCode: 404,
+          message: `Size '${
+            product?.size ?? "NOT_SPECIFIED"
+          }' not found. Please create the size to add the product.`,
+        };
+
+      let category = await Category.getCategory({ name: product?.category });
+
+      if (category?.statusCode === 404) {
+        throw {
+          statusCode: 404,
+          message: `Category '${
+            product?.category ?? "NOT_SPECIFIED"
+          }' not found. Please create the category to add the product.`,
+        };
+      }
+
+      let productHolder = await this.getProduct(product);
+
+      if (productHolder?.statusCode === 400) {
+        productHolder = await createProduct({
+          name: product.name,
+          desc: product.desc,
+          category: category,
+          material: product.material,
+        });
+      }
+
+      const productConfigurationAlreadyExists = await findOption({
+        id: productHolder.id,
+        name: product.name,
+        color: color,
+        size: size,
+        category: category,
+        image: product.image,
+      });
+
+      // console.log(productConfigurationAlreadyExists);
+      if (productConfigurationAlreadyExists.length > 0) {
+        throw {
+          statusCode: 400,
+          message: `Product ${product?.name} already exists with those options. Please try updating the existing configuration.`,
+        };
+      }
+
+      const response = await createOption({
+        id: productHolder.id,
+        color: color,
+        size: size,
+        category: category,
+        quantity: product?.quantity,
+        price: product?.price,
+        image: product?.image,
+      });
+
+      return await findOption({
+        id: response[0].product_id,
+        size: response[0].size_id,
+        color: response[0].color_id,
+      });
+    } catch (e) {
+      throw {
+        statusCode: e.statusCode || 500,
+        message: e,
+      };
+    }
+  },
+  getProducts: async function ({ limit = 10, offset = 0, ...args } = {}) {
+    const parsedLimit = parseInt(limit, 10);
+    const parsedOffset = parseInt(offset, 10);
+
+    if (
+      Number.isNaN(parsedLimit) ||
+      parsedLimit < 0 ||
+      Number.isNaN(parsedOffset) ||
+      parsedOffset < 0 ||
+      Object.keys(args).length > 0
+    ) {
+      throw { statusCode: 400, message: "Invalid parameters." };
+    }
+
+    try {
+      const response = await findProduct({
+        id: null,
+        name: null,
+        limit: parsedLimit,
+        offset: parsedOffset,
+      });
+
+      return response;
+    } catch (e) {
+      throw { statusCode: e.statusCode || 500, message: e.message };
+    }
+  },
+  getProduct: async function (product) {
+    if (!product?.name && !product?.id)
+      throw { statusCode: 400, message: `Missing product information` };
+
+    try {
+      const response = await findProduct({
+        id: product.id,
+        name: product.name,
+      });
+
+      return response;
+    } catch (e) {
+      throw { statusCode: e.statusCode || 500, message: e.message };
+    }
+  },
+  getOption: async function (product) {
+    if (!product?.name && !product?.id)
+      throw { statusCode: 400, message: `Missing product information` };
+
+    try {
+      const response = await findOption({
+        id: product.id,
+        name: product.name,
+      });
+
+      return response;
+    } catch (e) {
+      throw { statusCode: e.statusCode || 500, message: e.message };
+    }
+  },
+};
+
+module.exports = Products;

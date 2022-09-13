@@ -4,8 +4,11 @@ const { Pool } = require("pg");
 const path = require("path");
 require("dotenv").config({ path: `${path.resolve(__dirname, "../../.env")}` });
 
-const db = require("../database/db.js");
-const dbFunctions = require("../database/dbFunctions.js");
+const { closeConnection } = require("../database/dbUtils.js");
+
+afterAll(async () => {
+  await closeConnection();
+});
 
 describe("Database functions", () => {
   require("./dbFunctions/getProduct.js");
@@ -17,6 +20,7 @@ describe("Database functions", () => {
 
 describe("Endpoints", () => {
   require("./endpoints/get/products.js");
+  require("./endpoints/post/products.js");
 });
 
 // response.forEach((product) => {

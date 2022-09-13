@@ -4,7 +4,7 @@ require("dotenv").config({
   path: `${path.resolve(__dirname, "../../../.env")}`,
 });
 
-const dbFunctions = require("../../database/dbFunctions.js");
+const Size = require("../../database/dbSize.js");
 
 const sizes = {
   size: expect.any(String),
@@ -12,7 +12,7 @@ const sizes = {
 
 describe("getSizes function", () => {
   it("no parameters", async () => {
-    const response = await dbFunctions.Products.getSizes();
+    const response = await Size.getSizes();
 
     expect(response).toBeInstanceOf(Array);
 
@@ -22,7 +22,7 @@ describe("getSizes function", () => {
   });
 
   it("faulty parameters", async () => {
-    const response = await dbFunctions.Products.getSizes({ test: "WHATEVER" });
+    const response = await Size.getSizes({ test: "WHATEVER" });
 
     expect(response).toBeInstanceOf(Array);
 
@@ -35,7 +35,7 @@ describe("getSizes function", () => {
 describe("getSize function", () => {
   it("parameter: size = S", async () => {
     const size = "S";
-    const response = await dbFunctions.Products.getSize({ size: size });
+    const response = await Size.getSize({ size: size });
 
     expect(response).toEqual(expect.any(Number));
   });
@@ -44,7 +44,7 @@ describe("getSize function", () => {
     expect.assertions(1);
 
     try {
-      await dbFunctions.Products.getSize();
+      await Size.getSize();
     } catch (e) {
       expect(e).toEqual({ statusCode: 400, message: expect.any(String) });
     }
@@ -54,7 +54,7 @@ describe("getSize function", () => {
     expect.assertions(1);
 
     try {
-      await dbFunctions.Products.getSize({ test: "WHATEVER" });
+      await Size.getSize({ test: "WHATEVER" });
     } catch (e) {
       expect(e).toEqual({ statusCode: 400, message: expect.any(String) });
     }

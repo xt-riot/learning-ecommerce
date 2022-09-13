@@ -1,10 +1,9 @@
 const controller = require("../routes-controller/user.controller.js");
-const db = require("../database/dbFunctions.js");
 
 module.exports = (server) => {
   server.get("/", async (req, res, next) => {
     const response = await controller.indexPage();
-    return res.status(response.statusCode).send(response.data);
+    return res.status(response.statusCode).json(response.data);
   });
 
   server.get("/products", async (req, res, next) => {
@@ -22,7 +21,9 @@ module.exports = (server) => {
 
       res.status(200).json(message);
     } catch (error) {
-      return res.status(error.statusCode || 500).send(error.message);
+      return res
+        .status(error.statusCode || 500)
+        .json({ message: error.message });
     }
   });
 
@@ -50,7 +51,7 @@ module.exports = (server) => {
 
       res.status(200).json(response);
     } catch (error) {
-      return res.status(error.statusCode || 500).send(error.message);
+      return res.status(error.statusCode || 500).json(error.message);
     }
   });
 
@@ -60,7 +61,7 @@ module.exports = (server) => {
 
       return res
         .status(200)
-        .json(`Successfully created size '${req.body.size}'`);
+        .json(`Successfully created size '${req.body.name}'`);
     } catch (e) {
       return res.status(e.statusCode || 500).json(e.message);
     }
@@ -72,7 +73,7 @@ module.exports = (server) => {
 
       return res
         .status(200)
-        .json(`Successfully created color '${req.body.color}'`);
+        .json(`Successfully created color '${req.body.name}'`);
     } catch (e) {
       return res.status(e.statusCode || 500).json(e.message);
     }
@@ -86,7 +87,7 @@ module.exports = (server) => {
         .status(200)
         .json(
           `Successfully created category '${
-            req.body.category.name || req.body.category
+            response.category || response.name
           }'`
         );
     } catch (e) {

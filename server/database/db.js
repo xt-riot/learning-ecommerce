@@ -14,4 +14,9 @@ const pool = new Pool({
   }`,
 });
 
+pool.on("error", (err, client) => {
+  console.log(err);
+  throw { statusCode: 500, message: err };
+});
+
 module.exports = { pool };

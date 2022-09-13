@@ -4,9 +4,10 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "jest --detectOpenHandles --coverage",
+    "test": "jest --detectOpenHandles",
     "dev": "nodemon index.js",
-    "start": "node index.js"
+    "start": "node index.js",
+    "docker-test": "docker compose -f ..\\docker-compose-database-test.yml down && docker compose -f ..\\docker-compose-database-test.yml up "
   },
   "author": "",
   "license": "ISC",

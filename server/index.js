@@ -1,4 +1,5 @@
 const server = require("./server.js");
+const { closeConnection } = require("./database/dbUtils.js");
 
 server.listen(process.env.NODE_PORT || 1337, () => {
   console.log(
@@ -14,4 +15,16 @@ process.on("uncaughtException", (error) => {
 
 process.on("unhandledRejection", (error) => {
   console.log("Unhandled rejection: ", error);
+});
+
+process.on("SIGKILL", async () => {
+  await closeConnection();
+  console.log("Exit signal received.");
+  process.exit(0);
+});
+
+process.on("SIGTERM", async () => {
+  await closeConnection();
+  console.log("Terminate signal received.");
+  process.exit(0);
 });

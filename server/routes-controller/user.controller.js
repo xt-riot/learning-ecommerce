@@ -1,4 +1,7 @@
-const db = require("../database/dbFunctions.js");
+const Products = require("../database/dbProduct.js");
+const Size = require("../database/dbSize.js");
+const Color = require("../database/dbColor.js");
+const Category = require("../database/dbCategory.js");
 
 exports.indexPage = () => {
   return { statusCode: 200, data: "<h1>Index page</h1>" };
@@ -6,7 +9,7 @@ exports.indexPage = () => {
 
 exports.findProduct = async (query) => {
   const parseID = parseInt(query?.id, 10);
-  const id = !Number.isNaN(parseID) ? parseID : -1;
+  const id = !Number.isNaN(parseID) ? parseID : null;
 
   const lim = parseInt(query?.limit, 10);
   const limit = !Number.isNaN(lim) ? (lim < 101 ? lim : 10) : 10; // TODO: do we need to throw or inform the client he can't search for more than 100 items at once?
@@ -16,12 +19,12 @@ exports.findProduct = async (query) => {
 
   const name = query.name || null;
 
-  if (id === -1 && !name) {
-    const response = await db.Products.getProducts(limit, pagination * limit);
+  if (id === null && !name) {
+    const response = await Products.getProducts(limit, pagination * limit);
 
     let products = await Promise.all(
       response.map(async (product) => {
-        return await db.Products.getOption({
+        return await Products.getOption({
           id: product.id,
           name: product.product_name,
         });
@@ -48,12 +51,16 @@ exports.findProduct = async (query) => {
     return { products: products, pagination: pagination + 1, limit: limit };
   }
 
-  const response = await db.Products.getProduct({
+  const response = await Products.getProduct({
     id: id,
     name: name?.replace(/"/g, "").replace(/\s\s+/g, " ").trim() || "",
   });
 
-  let product = await db.Products.getOption({
+  if (response?.statusCode === 400) {
+    throw response;
+  }
+
+  let product = await Products.getOption({
     id: response.id,
     name: response.product_name,
   });
@@ -104,6 +111,17 @@ exports.findProduct = async (query) => {
 //   return dummyProducts.products[product];
 // };
 
+const productMapper = [
+  "name",
+  "desc",
+  "price",
+  "quantity",
+  "category",
+  "color",
+  "size",
+  "material",
+];
+
 exports.addProduct = async (product) => {
   if (product === undefined) {
     throw {
@@ -118,10 +136,10 @@ exports.addProduct = async (product) => {
 
   if (!isDataValid) return -1;
 
-  return await db.Products.addProduct(product);
+  return await Products.addProduct(product);
 };
 
-exports.addSize = async ({ size }) => {
+exports.addSize = async ({ name: size }) => {
   if (size === undefined || typeof size !== "string") {
     throw {
       statusCode: 400,
@@ -129,10 +147,10 @@ exports.addSize = async ({ size }) => {
     };
   }
 
-  return await db.Products.addSize(size);
+  return await Size.addSize({ name: size });
 };
 
-exports.addColor = async ({ color: color }) => {
+exports.addColor = async ({ name: color }) => {
   if (color === undefined || typeof color !== "string") {
     throw {
       statusCode: 400,
@@ -140,13 +158,13 @@ exports.addColor = async ({ color: color }) => {
     };
   }
 
-  return await db.Products.addColor(color);
+  return await Color.addColor({ color: color });
 };
 
-exports.addCategory = async ({ category }) => {
+exports.addCategory = async ({ name }) => {
   if (
-    category === undefined ||
-    (typeof category !== "string" && typeof category !== "object")
+    name === undefined ||
+    (typeof name !== "string" && typeof name !== "object")
   ) {
     throw {
       statusCode: 400,
@@ -154,26 +172,25 @@ exports.addCategory = async ({ category }) => {
     };
   }
 
-  return await db.Products.addCategory({
-    name: category.name || category,
-    description: category.description || "",
+  return await Category.addCategory({
+    name: name.name || name,
   });
 };
 
 exports.getCategories = async () => {
-  const response = await db.Products.getCategories();
+  const response = await Category.getCategories();
 
   return response;
 };
 
 exports.getColors = async () => {
-  const response = await db.Products.getColors();
+  const response = await Color.getColors();
 
   return response;
 };
 
 exports.getSizes = async () => {
-  const response = await db.Products.getSizes();
+  const response = await Size.getSizes();
 
   return response;
 };
