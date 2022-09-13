@@ -31,6 +31,7 @@ export default class Container extends Component {
       <div id='container' data-theme={this.state.theme}>
         <TopNavbar />
         <Navbar onClick={this.switchTheme} />
+        <Products />
         <Footer />
       </div>
     );

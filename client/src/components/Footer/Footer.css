@@ -1,7 +1,7 @@
 .footer {
-  position: absolute;
+  position: sticky;
+  top: 100%;
   width: 100%;
-  bottom: 0;
   color: var(--text-primary);
   background-color: var(--footer-color);
 }
