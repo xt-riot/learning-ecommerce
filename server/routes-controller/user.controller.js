@@ -3,6 +3,17 @@ const Size = require("../database/dbSize.js");
 const Color = require("../database/dbColor.js");
 const Category = require("../database/dbCategory.js");
 
+const productMapper = [
+  "name",
+  "desc",
+  "price",
+  "quantity",
+  "category",
+  "color",
+  "size",
+  "material",
+];
+
 exports.indexPage = () => {
   return { statusCode: 200, data: "<h1>Index page</h1>" };
 };
@@ -13,6 +24,7 @@ exports.findProduct = async (query) => {
 
   const lim = parseInt(query?.limit, 10);
   const limit = !Number.isNaN(lim) ? (lim < 101 ? lim : 10) : 10; // TODO: do we need to throw or inform the client he can't search for more than 100 items at once?
+  console.log(limit);
 
   const page = parseInt(query?.p, 10);
   const pagination = !Number.isNaN(page) ? page : 0;
@@ -46,7 +58,6 @@ exports.findProduct = async (query) => {
         { color: [], size: [], price: [], quantity: [] }
       );
     });
-    // console.log(products);
 
     return { products: products, pagination: pagination + 1, limit: limit };
   }
@@ -81,46 +92,6 @@ exports.findProduct = async (query) => {
 
   return product;
 };
-
-// TODO: Implement this
-
-// const productMapper = [
-//   "name",
-//   "desc",
-//   "price",
-//   "quantity",
-//   "category",
-//   "color",
-//   "size",
-// ];
-// exports.changeProduct = (id, data) => {
-//   let product = dummyProducts.products.findIndex(
-//     (product) => product.id === id
-//   );
-//   const dataKeys = Object.keys(data);
-//   const isDataValid = dataKeys
-//     .map((key) => productMapper.includes(key))
-//     .reduce((acc, item) => item && acc, true);
-
-//   if (!isDataValid) return -1;
-
-//   dummyProducts.products[product] = {
-//     ...dummyProducts.products[product],
-//     ...data,
-//   };
-//   return dummyProducts.products[product];
-// };
-
-const productMapper = [
-  "name",
-  "desc",
-  "price",
-  "quantity",
-  "category",
-  "color",
-  "size",
-  "material",
-];
 
 exports.addProduct = async (product) => {
   if (product === undefined) {
