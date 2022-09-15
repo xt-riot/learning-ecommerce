@@ -1,4 +1,4 @@
-const { findColor, createColor } = require('./dbUtils');
+const { findColor, createColor } = require("./dbUtils");
 
 const Color = {
   async getColors() {
@@ -6,28 +6,28 @@ const Color = {
       const response = await findColor({ all: true });
       return response.rows.reduce((acc, color) => [...acc, color], []);
     } catch (e) {
-      throw new Error({
+      throw {
         statusCode: 500,
         message: e,
-      });
+      };
     }
   },
-  async getColor({ color = '' } = {}, ...args) {
-    if (args.length > 0 || color === '') {
-      throw new Error({
+  async getColor({ color = "" } = {}, ...args) {
+    if (args.length > 0 || color === "") {
+      throw {
         statusCode: 400,
-        message: 'Invalid parameters. Please contact an administrator.',
-      });
+        message: "Invalid parameters. Please contact an administrator.",
+      };
     }
     try {
       const response = await findColor({ name: color });
 
       return response;
     } catch (e) {
-      throw new Error({
+      throw {
         statusCode: e.statusCode || 500,
         message: e.message,
-      });
+      };
     }
   },
   async addColor({ color: name }) {
@@ -41,7 +41,7 @@ const Color = {
       return response;
     }
 
-    throw new Error({ statusCode: 400, message: 'Color already exists.' });
+    throw { statusCode: 400, message: "Color already exists." };
   },
 };
 

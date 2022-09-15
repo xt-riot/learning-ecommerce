@@ -1,4 +1,4 @@
-const { findCategory, createCategory } = require('./dbUtils');
+const { findCategory, createCategory } = require("./dbUtils");
 
 const Category = {
   async getCategories() {
@@ -7,18 +7,18 @@ const Category = {
 
       return response.rows.reduce((acc, category) => [...acc, category], []);
     } catch (e) {
-      throw new Error({
+      throw {
         statusCode: 500,
         message: e,
-      });
+      };
     }
   },
-  async getCategory({ name = '' } = {}, ...args) {
-    if (args.length > 0 || name === '') {
-      throw new Error({
+  async getCategory({ name = "" } = {}, ...args) {
+    if (args.length > 0 || name === "") {
+      throw {
         statusCode: 400,
-        message: 'Invalid parameters. Please contact an administrator.',
-      });
+        message: "Invalid parameters. Please contact an administrator.",
+      };
     }
 
     try {
@@ -26,10 +26,10 @@ const Category = {
 
       return response;
     } catch (e) {
-      throw new Error({
+      throw {
         statusCode: e.statusCode || 500,
         message: e.message,
-      });
+      };
     }
   },
   async addCategory({ name }) {
@@ -43,7 +43,7 @@ const Category = {
       return response;
     }
 
-    throw new Error({ statusCode: 400, message: 'Category already exists.' });
+    throw { statusCode: 400, message: "Category already exists." };
   },
 };
 

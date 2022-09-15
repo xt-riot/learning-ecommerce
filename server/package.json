@@ -7,7 +7,7 @@
     "test": "jest --detectOpenHandles",
     "dev": "nodemon index.js",
     "start": "node index.js",
-    "lint": "eslint '/*.js' --fix",
+    "lint": "eslint './**/*.js' --fix",
     "format": "prettier-eslint './**/*.{js,json}' --write"
   },
   "author": "",
