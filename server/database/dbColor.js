@@ -1,4 +1,4 @@
-const { findColor, createColor } = require("./dbUtils");
+const { findColor, createColor } = require('./dbUtils');
 
 const Color = {
   async getColors() {
@@ -12,11 +12,11 @@ const Color = {
       };
     }
   },
-  async getColor({ color = "" } = {}, ...args) {
-    if (args.length > 0 || color === "") {
+  async getColor({ color = '' } = {}, ...args) {
+    if (args.length > 0 || color === '') {
       throw {
         statusCode: 400,
-        message: "Invalid parameters. Please contact an administrator.",
+        message: 'Invalid parameters. Please contact an administrator.',
       };
     }
     try {
@@ -41,7 +41,7 @@ const Color = {
       return response;
     }
 
-    throw { statusCode: 400, message: "Color already exists." };
+    throw { statusCode: 400, message: 'Color already exists.' };
   },
 };
 

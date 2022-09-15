@@ -15,7 +15,7 @@
     "promise/no-return-wrap": "error",
     "promise/param-names": "error",
     "promise/catch-or-return": "error",
-    "promise/no-native": "off",                                                                                             
+    "promise/no-native": "off",
     "promise/no-nesting": "error",
     "promise/no-promise-in-callback": "error",
     "promise/no-callback-in-promise": "error",
@@ -26,6 +26,15 @@
     "jest/no-identical-title": "error",
     "jest/prefer-to-have-length": "warn",
     "jest/valid-expect": "error",
-    "max-len": ["error", {"ignoreComments": true, "ignoreTrailingComments": true, "ignoreUrls": true, "code": 150}]
+    "max-len": [
+      "error",
+      {
+        "ignoreComments": true,
+        "ignoreTrailingComments": true,
+        "ignoreUrls": true,
+        "code": 150
+      }
+    ],
+    "no-throw-literal": "off"
   }
 }

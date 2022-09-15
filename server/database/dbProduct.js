@@ -3,11 +3,11 @@ const {
   createProduct,
   findOption,
   createOption,
-} = require("./dbUtils");
+} = require('./dbUtils');
 
-const Color = require("./dbColor");
-const Size = require("./dbSize");
-const Category = require("./dbCategory");
+const Color = require('./dbColor');
+const Size = require('./dbSize');
+const Category = require('./dbCategory');
 
 const Products = {
   async addProduct(product) {
@@ -18,7 +18,7 @@ const Products = {
         throw {
           statusCode: 404,
           message: `Color '${
-            product?.color ?? "NOT_SPECIFIED"
+            product?.color ?? 'NOT_SPECIFIED'
           }' not found. Please create the color to add the product.`,
         };
       }
@@ -29,7 +29,7 @@ const Products = {
         throw {
           statusCode: 404,
           message: `Size '${
-            product?.size ?? "NOT_SPECIFIED"
+            product?.size ?? 'NOT_SPECIFIED'
           }' not found. Please create the size to add the product.`,
         };
       }
@@ -40,7 +40,7 @@ const Products = {
         throw {
           statusCode: 404,
           message: `Category '${
-            product?.category ?? "NOT_SPECIFIED"
+            product?.category ?? 'NOT_SPECIFIED'
           }' not found. Please create the category to add the product.`,
         };
       }
@@ -100,13 +100,13 @@ const Products = {
     const parsedOffset = parseInt(offset, 10);
 
     if (
-      Number.isNaN(parsedLimit) ||
-      parsedLimit < 0 ||
-      Number.isNaN(parsedOffset) ||
-      parsedOffset < 0 ||
-      Object.keys(args).length > 0
+      Number.isNaN(parsedLimit)
+      || parsedLimit < 0
+      || Number.isNaN(parsedOffset)
+      || parsedOffset < 0
+      || Object.keys(args).length > 0
     ) {
-      throw { statusCode: 400, message: "Invalid parameters." };
+      throw { statusCode: 400, message: 'Invalid parameters.' };
     }
 
     try {
@@ -126,7 +126,7 @@ const Products = {
     if (!product?.name && !product?.id) {
       throw {
         statusCode: 400,
-        message: "Missing product information",
+        message: 'Missing product information',
       };
     }
 
@@ -145,7 +145,7 @@ const Products = {
     if (!product?.name && !product?.id) {
       throw {
         statusCode: 400,
-        message: "Missing product information",
+        message: 'Missing product information',
       };
     }
 

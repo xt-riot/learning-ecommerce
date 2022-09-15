@@ -1,4 +1,4 @@
-const { findSize, createSize } = require("./dbUtils");
+const { findSize, createSize } = require('./dbUtils');
 
 const Size = {
   async getSizes() {
@@ -13,11 +13,11 @@ const Size = {
       };
     }
   },
-  async getSize({ size = "" } = {}, ...args) {
-    if (args.length > 0 || size === "") {
+  async getSize({ size = '' } = {}, ...args) {
+    if (args.length > 0 || size === '') {
       throw {
         statusCode: 400,
-        message: "Invalid parameters. Please contact an administrator.",
+        message: 'Invalid parameters. Please contact an administrator.',
       };
     }
 
@@ -43,7 +43,7 @@ const Size = {
       return response;
     }
 
-    throw { statusCode: 400, message: "Size already exists." };
+    throw { statusCode: 400, message: 'Size already exists.' };
   },
 };
 

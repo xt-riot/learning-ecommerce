@@ -1,4 +1,4 @@
-const { findCategory, createCategory } = require("./dbUtils");
+const { findCategory, createCategory } = require('./dbUtils');
 
 const Category = {
   async getCategories() {
@@ -13,11 +13,11 @@ const Category = {
       };
     }
   },
-  async getCategory({ name = "" } = {}, ...args) {
-    if (args.length > 0 || name === "") {
+  async getCategory({ name = '' } = {}, ...args) {
+    if (args.length > 0 || name === '') {
       throw {
         statusCode: 400,
-        message: "Invalid parameters. Please contact an administrator.",
+        message: 'Invalid parameters. Please contact an administrator.',
       };
     }
 
@@ -43,7 +43,7 @@ const Category = {
       return response;
     }
 
-    throw { statusCode: 400, message: "Category already exists." };
+    throw { statusCode: 400, message: 'Category already exists.' };
   },
 };
 
