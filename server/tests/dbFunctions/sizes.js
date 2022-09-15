@@ -1,17 +1,11 @@
-const { Pool } = require("pg");
-const path = require("path");
-require("dotenv").config({
-  path: `${path.resolve(__dirname, "../../../.env")}`,
-});
-
-const Size = require("../../database/dbSize.js");
+const Size = require('../../database/dbSize');
 
 const sizes = {
   size: expect.any(String),
 };
 
-describe("getSizes function", () => {
-  it("no parameters", async () => {
+describe('getSizes function', () => {
+  it('no parameters', async () => {
     const response = await Size.getSizes();
 
     expect(response).toBeInstanceOf(Array);
@@ -21,8 +15,8 @@ describe("getSizes function", () => {
     });
   });
 
-  it("faulty parameters", async () => {
-    const response = await Size.getSizes({ test: "WHATEVER" });
+  it('faulty parameters', async () => {
+    const response = await Size.getSizes({ test: 'WHATEVER' });
 
     expect(response).toBeInstanceOf(Array);
 
@@ -32,15 +26,15 @@ describe("getSizes function", () => {
   });
 });
 
-describe("getSize function", () => {
-  it("parameter: size = S", async () => {
-    const size = "S";
-    const response = await Size.getSize({ size: size });
+describe('getSize function', () => {
+  it('parameter: size = S', async () => {
+    const size = 'S';
+    const response = await Size.getSize({ size });
 
     expect(response).toEqual(expect.any(Number));
   });
 
-  it("no parameters -- THROWS ERROR", async () => {
+  it('no parameters -- THROWS ERROR', async () => {
     expect.assertions(1);
 
     try {
@@ -50,11 +44,11 @@ describe("getSize function", () => {
     }
   });
 
-  it("faulty parameters -- THROWS ERROR", async () => {
+  it('faulty parameters -- THROWS ERROR', async () => {
     expect.assertions(1);
 
     try {
-      await Size.getSize({ test: "WHATEVER" });
+      await Size.getSize({ test: 'WHATEVER' });
     } catch (e) {
       expect(e).toEqual({ statusCode: 400, message: expect.any(String) });
     }

@@ -1,17 +1,11 @@
-const { Pool } = require("pg");
-const path = require("path");
-require("dotenv").config({
-  path: `${path.resolve(__dirname, "../../../.env")}`,
-});
-
-const Color = require("../../database/dbColor.js");
+const Color = require('../../database/dbColor');
 
 const colors = {
   color: expect.any(String),
 };
 
-describe("getColors function", () => {
-  it("no parameters", async () => {
+describe('getColors function', () => {
+  it('no parameters', async () => {
     const response = await Color.getColors();
 
     expect(response).toBeInstanceOf(Array);
@@ -21,8 +15,8 @@ describe("getColors function", () => {
     });
   });
 
-  it("faulty parameters", async () => {
-    const response = await Color.getColors({ test: "WHATEVER" });
+  it('faulty parameters', async () => {
+    const response = await Color.getColors({ test: 'WHATEVER' });
 
     expect(response).toBeInstanceOf(Array);
 
@@ -32,15 +26,15 @@ describe("getColors function", () => {
   });
 });
 
-describe("getColor function", () => {
-  it("parameter: color = red", async () => {
-    const color = "red";
-    const response = await Color.getColor({ color: color });
+describe('getColor function', () => {
+  it('parameter: color = red', async () => {
+    const color = 'red';
+    const response = await Color.getColor({ color });
 
     expect(response).toEqual(expect.any(Number));
   });
 
-  it("no parameters -- THROWS ERROR", async () => {
+  it('no parameters -- THROWS ERROR', async () => {
     expect.assertions(1);
 
     try {
@@ -50,11 +44,11 @@ describe("getColor function", () => {
     }
   });
 
-  it("faulty parameters -- THROWS ERROR", async () => {
+  it('faulty parameters -- THROWS ERROR', async () => {
     expect.assertions(1);
 
     try {
-      await Color.getColor({ test: "WHATEVER" });
+      await Color.getColor({ test: 'WHATEVER' });
     } catch (e) {
       expect(e).toEqual({ statusCode: 400, message: expect.any(String) });
     }

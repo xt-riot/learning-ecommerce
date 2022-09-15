@@ -1,47 +1,47 @@
-const { findColor, createColor } = require("./dbUtils.js");
+const { findColor, createColor } = require('./dbUtils');
 
 const Color = {
-  getColors: async function () {
+  async getColors() {
     try {
       const response = await findColor({ all: true });
       return response.rows.reduce((acc, color) => [...acc, color], []);
     } catch (e) {
-      throw {
+      throw new Error({
         statusCode: 500,
         message: e,
-      };
+      });
     }
   },
-  getColor: async function ({ color = "" } = {}, ...args) {
-    if (args.length > 0 || color === "") {
-      throw {
+  async getColor({ color = '' } = {}, ...args) {
+    if (args.length > 0 || color === '') {
+      throw new Error({
         statusCode: 400,
-        message: `Invalid parameters. Please contact an administrator.`,
-      };
+        message: 'Invalid parameters. Please contact an administrator.',
+      });
     }
     try {
       const response = await findColor({ name: color });
 
       return response;
     } catch (e) {
-      throw {
+      throw new Error({
         statusCode: e.statusCode || 500,
         message: e.message,
-      };
+      });
     }
   },
-  addColor: async function ({ color: name }) {
-    const response = await this.getColor({ color: name });
+  async addColor({ color: name }) {
+    let response = await this.getColor({ color: name });
 
     if (response?.statusCode === 404) {
-      const response = await createColor({
-        name: name,
+      response = await createColor({
+        name,
       });
 
       return response;
     }
 
-    throw { statusCode: 400, message: `Color already exists.` };
+    throw new Error({ statusCode: 400, message: 'Color already exists.' });
   },
 };
 

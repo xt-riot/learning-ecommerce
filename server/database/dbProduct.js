@@ -3,44 +3,46 @@ const {
   createProduct,
   findOption,
   createOption,
-} = require("./dbUtils.js");
+} = require('./dbUtils');
 
-const Color = require("./dbColor.js");
-const Size = require("./dbSize.js");
-const Category = require("./dbCategory.js");
+const Color = require('./dbColor');
+const Size = require('./dbSize');
+const Category = require('./dbCategory');
 
 const Products = {
-  addProduct: async function (product) {
+  async addProduct(product) {
     try {
-      let color = await Color.getColor({ color: product?.color });
+      const color = await Color.getColor({ color: product?.color });
 
-      if (color?.statusCode === 404)
-        throw {
+      if (color?.statusCode === 404) {
+        throw new Error({
           statusCode: 404,
           message: `Color '${
-            product?.color ?? "NOT_SPECIFIED"
+            product?.color ?? 'NOT_SPECIFIED'
           }' not found. Please create the color to add the product.`,
-        };
+        });
+      }
 
-      let size = await Size.getSize({ size: product?.size });
+      const size = await Size.getSize({ size: product?.size });
 
-      if (size?.statusCode === 404)
-        throw {
+      if (size?.statusCode === 404) {
+        throw new Error({
           statusCode: 404,
           message: `Size '${
-            product?.size ?? "NOT_SPECIFIED"
+            product?.size ?? 'NOT_SPECIFIED'
           }' not found. Please create the size to add the product.`,
-        };
+        });
+      }
 
-      let category = await Category.getCategory({ name: product?.category });
+      const category = await Category.getCategory({ name: product?.category });
 
       if (category?.statusCode === 404) {
-        throw {
+        throw new Error({
           statusCode: 404,
           message: `Category '${
-            product?.category ?? "NOT_SPECIFIED"
+            product?.category ?? 'NOT_SPECIFIED'
           }' not found. Please create the category to add the product.`,
-        };
+        });
       }
 
       let productHolder = await this.getProduct(product);
@@ -49,7 +51,7 @@ const Products = {
         productHolder = await createProduct({
           name: product.name,
           desc: product.desc,
-          category: category,
+          category,
           material: product.material,
         });
       }
@@ -57,25 +59,25 @@ const Products = {
       const productConfigurationAlreadyExists = await findOption({
         id: productHolder.id,
         name: product.name,
-        color: color,
-        size: size,
-        category: category,
+        color,
+        size,
+        category,
         image: product.image,
       });
 
       // console.log(productConfigurationAlreadyExists);
       if (productConfigurationAlreadyExists.length > 0) {
-        throw {
+        throw new Error({
           statusCode: 400,
           message: `Product ${product?.name} already exists with those options. Please try updating the existing configuration.`,
-        };
+        });
       }
 
       const response = await createOption({
         id: productHolder.id,
-        color: color,
-        size: size,
-        category: category,
+        color,
+        size,
+        category,
         quantity: product?.quantity,
         price: product?.price,
         image: product?.image,
@@ -87,24 +89,24 @@ const Products = {
         color: response[0].color_id,
       });
     } catch (e) {
-      throw {
+      throw new Error({
         statusCode: e.statusCode || 500,
         message: e,
-      };
+      });
     }
   },
-  getProducts: async function ({ limit = 10, offset = 0, ...args } = {}) {
+  async getProducts({ limit = 10, offset = 0, ...args } = {}) {
     const parsedLimit = parseInt(limit, 10);
     const parsedOffset = parseInt(offset, 10);
 
     if (
-      Number.isNaN(parsedLimit) ||
-      parsedLimit < 0 ||
-      Number.isNaN(parsedOffset) ||
-      parsedOffset < 0 ||
-      Object.keys(args).length > 0
+      Number.isNaN(parsedLimit)
+      || parsedLimit < 0
+      || Number.isNaN(parsedOffset)
+      || parsedOffset < 0
+      || Object.keys(args).length > 0
     ) {
-      throw { statusCode: 400, message: "Invalid parameters." };
+      throw new Error({ statusCode: 400, message: 'Invalid parameters.' });
     }
 
     try {
@@ -117,12 +119,16 @@ const Products = {
 
       return response;
     } catch (e) {
-      throw { statusCode: e.statusCode || 500, message: e.message };
+      throw new Error({ statusCode: e.statusCode || 500, message: e.message });
     }
   },
-  getProduct: async function (product) {
-    if (!product?.name && !product?.id)
-      throw { statusCode: 400, message: `Missing product information` };
+  async getProduct(product) {
+    if (!product?.name && !product?.id) {
+      throw new Error({
+        statusCode: 400,
+        message: 'Missing product information',
+      });
+    }
 
     try {
       const response = await findProduct({
@@ -132,12 +138,16 @@ const Products = {
 
       return response;
     } catch (e) {
-      throw { statusCode: e.statusCode || 500, message: e.message };
+      throw new Error({ statusCode: e.statusCode || 500, message: e.message });
     }
   },
-  getOption: async function (product) {
-    if (!product?.name && !product?.id)
-      throw { statusCode: 400, message: `Missing product information` };
+  async getOption(product) {
+    if (!product?.name && !product?.id) {
+      throw new Error({
+        statusCode: 400,
+        message: 'Missing product information',
+      });
+    }
 
     try {
       const response = await findOption({
@@ -147,7 +157,7 @@ const Products = {
 
       return response;
     } catch (e) {
-      throw { statusCode: e.statusCode || 500, message: e.message };
+      throw new Error({ statusCode: e.statusCode || 500, message: e.message });
     }
   },
 };

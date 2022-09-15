@@ -1,25 +1,25 @@
-const controller = require("../routes-controller/user.controller.js");
+const controller = require('../routes-controller/user.controller');
 
 module.exports = (server) => {
-  server.get("/", async (req, res, next) => {
+  server.get('/', async (req, res) => {
     const response = await controller.indexPage();
     return res.status(response.statusCode).json(response.data);
   });
 
-  server.get("/products", async (req, res, next) => {
+  server.get('/products', async (req, res) => {
     try {
       const response = await controller.findProduct(req.query);
 
       const message = response.products
         ? {
-            nextPage: `/products?p=${response.pagination}${
-              req.query?.limit ? `&limit=${response.limit}` : ``
-            }`,
-            products: response.products,
-          }
+          nextPage: `/products?p=${response.pagination}${
+            req.query?.limit ? `&limit=${response.limit}` : ''
+          }`,
+          products: response.products,
+        }
         : response;
 
-      res.status(200).json(message);
+      return res.status(200).json(message);
     } catch (error) {
       return res
         .status(error.statusCode || 500)
@@ -28,7 +28,7 @@ module.exports = (server) => {
   });
 
   // TODO: Implement this
-  // server.post("/products", async (req, res, next) => {
+  // server.post("/products", async (req, res) => {
   //   const parseID = parseInt(req.body.id, 10);
   //   const id = !Number.isNaN(parseID) ? parseID : -1;
   //   const data = req.body.changeData;
@@ -45,19 +45,19 @@ module.exports = (server) => {
   //   return res.json(response);
   // });
 
-  server.post("/products", async (req, res, next) => {
+  server.post('/products', async (req, res) => {
     try {
       const response = await controller.addProduct(req.body);
 
-      res.status(200).json(response);
+      return res.status(200).json(response);
     } catch (error) {
       return res.status(error.statusCode || 500).json(error.message);
     }
   });
 
-  server.post("/sizes", async (req, res, next) => {
+  server.post('/sizes', async (req, res) => {
     try {
-      const response = await controller.addSize(req.body);
+      await controller.addSize(req.body);
 
       return res
         .status(200)
@@ -67,9 +67,9 @@ module.exports = (server) => {
     }
   });
 
-  server.post("/colors", async (req, res, next) => {
+  server.post('/colors', async (req, res) => {
     try {
-      const response = await controller.addColor(req.body);
+      await controller.addColor(req.body);
 
       return res
         .status(200)
@@ -79,8 +79,7 @@ module.exports = (server) => {
     }
   });
 
-
-  server.post("/categories", async (req, res, next) => {
+  server.post('/categories', async (req, res) => {
     try {
       const response = await controller.addCategory(req.body);
 
@@ -89,25 +88,25 @@ module.exports = (server) => {
         .json(
           `Successfully created category '${
             response.category || response.name
-          }'`
+          }'`,
         );
     } catch (e) {
       return res.status(e.statusCode || 500).json(e.message);
     }
   });
 
-  server.get("/categories", async (req, res, next) => {
+  server.get('/categories', async (req, res) => {
     try {
-      const response = (await controller.getCategories()).map((category) => {
-        return { name: category.categoryname };
-      });
+      const response = (await controller.getCategories()).map((category) => ({
+        name: category.categoryname,
+      }));
       return res.status(200).json({ categories: response });
     } catch (e) {
       return res.status(e.statusCode || 500).json(e.message);
     }
   });
 
-  server.get("/colors", async (req, res, next) => {
+  server.get('/colors', async (req, res) => {
     try {
       const response = await controller.getColors();
 
@@ -117,11 +116,11 @@ module.exports = (server) => {
     }
   });
 
-  server.get("/sizes", async (req, res, next) => {
+  server.get('/sizes', async (req, res) => {
     try {
-      const response = (await controller.getSizes()).map((size) => {
-        return { size: size.size };
-      });
+      const response = (await controller.getSizes()).map((size) => ({
+        size: size.size,
+      }));
       return res.status(200).json({ sizes: response });
     } catch (e) {
       return res.status(e.statusCode || 500).json(e.message);

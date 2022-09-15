@@ -1,30 +1,27 @@
-const Products = require("../database/dbProduct.js");
-const Size = require("../database/dbSize.js");
-const Color = require("../database/dbColor.js");
-const Category = require("../database/dbCategory.js");
+const Products = require('../database/dbProduct');
+const Size = require('../database/dbSize');
+const Color = require('../database/dbColor');
+const Category = require('../database/dbCategory');
 
 const productMapper = [
-  "name",
-  "desc",
-  "price",
-  "quantity",
-  "category",
-  "color",
-  "size",
-  "material",
+  'name',
+  'desc',
+  'price',
+  'quantity',
+  'category',
+  'color',
+  'size',
+  'material',
 ];
 
-exports.indexPage = () => {
-  return { statusCode: 200, data: "<h1>Index page</h1>" };
-};
+exports.indexPage = () => ({ statusCode: 200, data: '<h1>Index page</h1>' });
 
 exports.findProduct = async (query) => {
   const parseID = parseInt(query?.id, 10);
   const id = !Number.isNaN(parseID) ? parseID : null;
 
   const lim = parseInt(query?.limit, 10);
-  const limit = !Number.isNaN(lim) ? (lim < 101 ? lim : 10) : 10; // TODO: do we need to throw or inform the client he can't search for more than 100 items at once?
-  console.log(limit);
+  const limit = !Number.isNaN(lim) && lim < 101 ? lim : 10;
 
   const page = parseInt(query?.p, 10);
   const pagination = !Number.isNaN(page) ? page : 0;
@@ -35,36 +32,35 @@ exports.findProduct = async (query) => {
     const response = await Products.getProducts(limit, pagination * limit);
 
     let products = await Promise.all(
-      response.map(async (product) => {
-        return await Products.getOption({
-          id: product.id,
-          name: product.product_name,
-        });
-      })
+      response.map(async (product) => Products.getOption({
+        id: product.id,
+        name: product.product_name,
+      })),
     );
 
-    products = products.map((product) => {
-      return product.reduce(
-        (acc, item) => {
-          return {
-            ...acc,
-            ...item,
-            color: [...acc.color, item.color],
-            size: [...acc.size, item.size],
-            price: [...acc.price, item.price],
-            quantity: [...acc.quantity, item.quantity],
-          };
-        },
-        { color: [], size: [], price: [], quantity: [] }
-      );
-    });
+    products = products.map((product) => product.reduce(
+      (acc, item) => ({
+        ...acc,
+        ...item,
+        color: [...acc.color, item.color],
+        size: [...acc.size, item.size],
+        price: [...acc.price, item.price],
+        quantity: [...acc.quantity, item.quantity],
+      }),
+      {
+        color: [],
+        size: [],
+        price: [],
+        quantity: [],
+      },
+    ));
 
-    return { products: products, pagination: pagination + 1, limit: limit };
+    return { products, pagination: pagination + 1, limit };
   }
 
   const response = await Products.getProduct({
-    id: id,
-    name: name?.replace(/"/g, "").replace(/\s\s+/g, " ").trim() || "",
+    id,
+    name: name?.replace(/"/g, '').replace(/\s\s+/g, ' ').trim() || '',
   });
 
   if (response?.statusCode === 400) {
@@ -77,17 +73,20 @@ exports.findProduct = async (query) => {
   });
 
   product = product.reduce(
-    (acc, item) => {
-      return {
-        ...acc,
-        ...item,
-        color: [...acc.color, item.color],
-        size: [...acc.size, item.size],
-        price: [...acc.price, item.price],
-        quantity: [...acc.quantity, item.quantity],
-      };
+    (acc, item) => ({
+      ...acc,
+      ...item,
+      color: [...acc.color, item.color],
+      size: [...acc.size, item.size],
+      price: [...acc.price, item.price],
+      quantity: [...acc.quantity, item.quantity],
+    }),
+    {
+      color: [],
+      size: [],
+      price: [],
+      quantity: [],
     },
-    { color: [], size: [], price: [], quantity: [] }
   );
 
   return product;
@@ -95,10 +94,10 @@ exports.findProduct = async (query) => {
 
 exports.addProduct = async (product) => {
   if (product === undefined) {
-    throw {
+    throw new Error({
       statusCode: 400,
-      message: "Missing required information about product.",
-    };
+      message: 'Missing required information about product.',
+    });
   }
   const dataKeys = Object.keys(product);
   const isDataValid = dataKeys
@@ -107,43 +106,43 @@ exports.addProduct = async (product) => {
 
   if (!isDataValid) return -1;
 
-  return await Products.addProduct(product);
+  return Products.addProduct(product);
 };
 
 exports.addSize = async ({ name: size }) => {
-  if (size === undefined || typeof size !== "string") {
-    throw {
+  if (size === undefined || typeof size !== 'string') {
+    throw new Error({
       statusCode: 400,
-      message: "Missing required information about size.",
-    };
+      message: 'Missing required information about size.',
+    });
   }
 
-  return await Size.addSize({ name: size });
+  return Size.addSize({ name: size });
 };
 
 exports.addColor = async ({ name: color }) => {
-  if (color === undefined || typeof color !== "string") {
-    throw {
+  if (color === undefined || typeof color !== 'string') {
+    throw new Error({
       statusCode: 400,
-      message: "Missing required information about color.",
-    };
+      message: 'Missing required information about color.',
+    });
   }
 
-  return await Color.addColor({ color: color });
+  return Color.addColor({ color });
 };
 
 exports.addCategory = async ({ name }) => {
   if (
-    name === undefined ||
-    (typeof name !== "string" && typeof name !== "object")
+    name === undefined
+    || (typeof name !== 'string' && typeof name !== 'object')
   ) {
-    throw {
+    throw new Error({
       statusCode: 400,
-      message: "Missing required information about category.",
-    };
+      message: 'Missing required information about category.',
+    });
   }
 
-  return await Category.addCategory({
+  return Category.addCategory({
     name: name.name || name,
   });
 };

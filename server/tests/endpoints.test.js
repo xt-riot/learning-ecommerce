@@ -1,26 +1,22 @@
-const request = require("supertest");
-const app = require("../server.js");
-const { Pool } = require("pg");
-const path = require("path");
-require("dotenv").config({ path: `${path.resolve(__dirname, "../../.env")}` });
-
-const { closeConnection } = require("../database/dbUtils.js");
+const { closeConnection } = require('../database/dbUtils');
 
 afterAll(async () => {
   await closeConnection();
 });
 
-describe("Database functions", () => {
-  require("./dbFunctions/getProduct.js");
-  require("./dbFunctions/getProducts.js");
-  require("./dbFunctions/colors.js");
-  require("./dbFunctions/sizes.js");
-  require("./dbFunctions/categories.js");
+describe('Database functions', () => {
+  /* eslint-disable */
+  require("./dbFunctions/getProduct");
+  require("./dbFunctions/getProducts");
+  require("./dbFunctions/colors");
+  require("./dbFunctions/sizes");
+  require("./dbFunctions/categories");
 });
 
 describe("Endpoints", () => {
-  require("./endpoints/get/products.js");
-  require("./endpoints/post/products.js");
+  require("./endpoints/get/products");
+  require("./endpoints/post/products");
+  /* eslint-enable */
 });
 
 // response.forEach((product) => {

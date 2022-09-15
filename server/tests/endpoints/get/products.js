@@ -1,8 +1,5 @@
-const request = require("supertest");
-const app = require("../../../server.js");
-const { Pool } = require("pg");
-const path = require("path");
-require("dotenv").config({ path: `${path.resolve(__dirname, "../../.env")}` });
+const request = require('supertest');
+const app = require('../../../server');
 
 const product = {
   product_name: expect.any(String),
@@ -23,9 +20,9 @@ const responseObject = {
   products: expect.any(Array),
 };
 
-describe("GET endpoints", () => {
-  it("should return a list of products -- /products", async () => {
-    const response = await request(app).get("/products");
+describe('GET endpoints', () => {
+  it('should return a list of products -- /products', async () => {
+    const response = await request(app).get('/products');
 
     expect(response.statusCode).toEqual(200);
     expect(response.body.error).toBe(undefined);
@@ -33,72 +30,56 @@ describe("GET endpoints", () => {
 
     response.body.products.forEach((item) => {
       expect(item).toStrictEqual(product);
-      item.color.map((product_color) =>
-        expect(product_color).toEqual(expect.any(String))
-      );
-      item.size.map((product_size) =>
-        expect(product_size).toEqual(expect.any(String))
-      );
-      item.quantity.map((product_quantity) =>
-        expect(product_quantity).toEqual(expect.any(Number))
-      );
-      item.price.map((product_price) =>
-        expect(product_price).toEqual(expect.any(Number))
-      );
+      item.color.forEach((productColor) => expect(productColor).toEqual(expect.any(String)));
+      item.size.forEach((productSize) => expect(productSize).toEqual(expect.any(String)));
+      item.quantity.forEach((productQuantity) => expect(productQuantity).toEqual(expect.any(Number)));
+      item.price.forEach((productPrice) => expect(productPrice).toEqual(expect.any(Number)));
     });
   });
 
-  it("should return one product with id 1 -- /products?id=1", async () => {
-    const response = await request(app).get("/products?id=1");
+  it('should return one product with id 1 -- /products?id=1', async () => {
+    const response = await request(app).get('/products?id=1');
 
     expect(response.statusCode).toEqual(200);
     expect(response.body.error).toBe(undefined);
     expect(response.body).toEqual(product);
 
-    response.body.color.map((product_color) =>
-      expect(product_color).toEqual(expect.any(String))
-    );
-    response.body.size.map((product_size) =>
-      expect(product_size).toEqual(expect.any(String))
-    );
-    response.body.quantity.map((product_quantity) =>
-      expect(product_quantity).toEqual(expect.any(Number))
-    );
-    response.body.price.map((product_price) =>
-      expect(product_price).toEqual(expect.any(Number))
-    );
+    response.body.color.forEach((productColor) => {
+      expect(productColor).toEqual(expect.any(String));
+    });
+    response.body.size.forEach((productSize) => {
+      expect(productSize).toEqual(expect.any(String));
+    });
+    response.body.quantity.forEach((productQuantity) => {
+      expect(productQuantity).toEqual(expect.any(Number));
+    });
+    response.body.price.forEach((productPrice) => {
+      expect(productPrice).toEqual(expect.any(Number));
+    });
   });
 
   it('should return one product with name "Awesome Granite Fish" -- /products?name="Awesome Granite Fish"', async () => {
     const response = await request(app).get(
-      '/products?name="Awesome Granite Fish"'
+      '/products?name="Awesome Granite Fish"',
     );
 
     expect(response.statusCode).toEqual(200);
     expect(response.body.error).toBe(undefined);
     expect(response.body).toEqual(product);
 
-    response.body.color.map((product_color) =>
-      expect(product_color).toEqual(expect.any(String))
-    );
-    response.body.size.map((product_size) =>
-      expect(product_size).toEqual(expect.any(String))
-    );
-    response.body.quantity.map((product_quantity) =>
-      expect(product_quantity).toEqual(expect.any(Number))
-    );
-    response.body.price.map((product_price) =>
-      expect(product_price).toEqual(expect.any(Number))
-    );
+    response.body.color.forEach((productColor) => expect(productColor).toEqual(expect.any(String)));
+    response.body.size.forEach((productSize) => expect(productSize).toEqual(expect.any(String)));
+    response.body.quantity.forEach((productQuantity) => expect(productQuantity).toEqual(expect.any(Number)));
+    response.body.price.forEach((productPrice) => expect(productPrice).toEqual(expect.any(Number)));
   });
 
-  it("should throw an error -- wrong parameters: id=-1", async () => {
+  it('should throw an error -- wrong parameters: id=-1', async () => {
     expect.assertions(2);
-    const response = await request(app).get("/products?id=-1");
+    const response = await request(app).get('/products?id=-1');
 
     expect(response.statusCode).toEqual(400);
     expect(response.body.message).toEqual(
-      "Could not find the product with those parameters."
+      'Could not find the product with those parameters.',
     );
   });
 
@@ -107,18 +88,18 @@ describe("GET endpoints", () => {
     const response = await request(app).get('/products?name="asdasd"');
     expect(response.statusCode).toEqual(400);
     expect(response.body.message).toEqual(
-      "Could not find the product with those parameters."
+      'Could not find the product with those parameters.',
     );
   });
 
   it("should throw an error -- wrong parameters: id=9, name='asdasd'", async () => {
     expect.assertions(2);
     const response = await request(app).get(
-      '/products?id=9&name="Awesome Granite Fish"'
+      '/products?id=9&name="Awesome Granite Fish"',
     );
     expect(response.statusCode).toEqual(400);
     expect(response.body.message).toEqual(
-      "Could not find the product with those parameters."
+      'Could not find the product with those parameters.',
     );
   });
 
@@ -127,44 +108,38 @@ describe("GET endpoints", () => {
     const response = await request(app).get('/products?id=-1&name="asdasd"');
     expect(response.statusCode).toEqual(400);
     expect(response.body.message).toEqual(
-      "Could not find the product with those parameters."
+      'Could not find the product with those parameters.',
     );
   });
 
-  it("should return all the categories -- /categories", async () => {
-    const response = await request(app).get("/categories");
+  it('should return all the categories -- /categories', async () => {
+    const response = await request(app).get('/categories');
 
     expect(response.statusCode).toEqual(200);
     expect(response.body.error).toBe(undefined);
     expect(response.body.categories).toBeInstanceOf(Array);
 
-    response.body.categories.map((category) =>
-      expect(category).toEqual({ name: expect.any(String) })
-    );
+    response.body.categories.forEach((category) => expect(category).toEqual({ name: expect.any(String) }));
   });
 
-  it("should return all colors -- /colors", async () => {
-    const response = await request(app).get("/colors");
+  it('should return all colors -- /colors', async () => {
+    const response = await request(app).get('/colors');
 
     expect(response.statusCode).toEqual(200);
     expect(response.body.error).toBe(undefined);
     expect(response.body.colors).toBeInstanceOf(Array);
 
-    response.body.colors.map((color) =>
-      expect(color).toEqual({ color: expect.any(String) })
-    );
+    response.body.colors.forEach((color) => expect(color).toEqual({ color: expect.any(String) }));
   });
 
-  it("should return all sizes -- /sizes", async () => {
-    const response = await request(app).get("/sizes");
+  it('should return all sizes -- /sizes', async () => {
+    const response = await request(app).get('/sizes');
 
     expect(response.statusCode).toEqual(200);
     expect(response.body.error).toBe(undefined);
     expect(response.body.sizes).toBeInstanceOf(Array);
 
-    response.body.sizes.map((size) =>
-      expect(size).toEqual({ size: expect.any(String) })
-    );
+    response.body.sizes.forEach((size) => expect(size).toEqual({ size: expect.any(String) }));
   });
 
   //   it("/products", async () => {

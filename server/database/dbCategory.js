@@ -1,49 +1,49 @@
-const { findCategory, createCategory } = require("./dbUtils.js");
+const { findCategory, createCategory } = require('./dbUtils');
 
 const Category = {
-  getCategories: async function () {
+  async getCategories() {
     try {
       const response = await findCategory({ all: true });
 
       return response.rows.reduce((acc, category) => [...acc, category], []);
     } catch (e) {
-      throw {
+      throw new Error({
         statusCode: 500,
         message: e,
-      };
+      });
     }
   },
-  getCategory: async function ({ name = "" } = {}, ...args) {
-    if (args.length > 0 || name === "") {
-      throw {
+  async getCategory({ name = '' } = {}, ...args) {
+    if (args.length > 0 || name === '') {
+      throw new Error({
         statusCode: 400,
-        message: `Invalid parameters. Please contact an administrator.`,
-      };
+        message: 'Invalid parameters. Please contact an administrator.',
+      });
     }
 
     try {
-      const response = await findCategory({ name: name });
+      const response = await findCategory({ name });
 
       return response;
     } catch (e) {
-      throw {
+      throw new Error({
         statusCode: e.statusCode || 500,
         message: e.message,
-      };
+      });
     }
   },
-  addCategory: async function ({ name }) {
-    const response = await this.getCategory({ name: name });
+  async addCategory({ name }) {
+    let response = await this.getCategory({ name });
 
     if (response?.statusCode === 404) {
-      const response = await createCategory({
-        name: name,
+      response = await createCategory({
+        name,
       });
 
       return response;
     }
 
-    throw { statusCode: 400, message: `Category already exists.` };
+    throw new Error({ statusCode: 400, message: 'Category already exists.' });
   },
 };
 

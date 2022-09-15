@@ -1,17 +1,11 @@
-const { Pool } = require("pg");
-const path = require("path");
-require("dotenv").config({
-  path: `${path.resolve(__dirname, "../../../.env")}`,
-});
-
-const Category = require("../../database/dbCategory.js");
+const Category = require('../../database/dbCategory');
 
 const categories = {
   categoryname: expect.any(String),
 };
 
-describe("getCategories function", () => {
-  it("no parameters", async () => {
+describe('getCategories function', () => {
+  it('no parameters', async () => {
     const response = await Category.getCategories();
 
     expect(response).toBeInstanceOf(Array);
@@ -21,9 +15,9 @@ describe("getCategories function", () => {
     });
   });
 
-  it("faulty parameters", async () => {
+  it('faulty parameters', async () => {
     const response = await Category.getCategories({
-      test: "WHATEVER",
+      test: 'WHATEVER',
     });
 
     expect(response).toBeInstanceOf(Array);
@@ -34,9 +28,9 @@ describe("getCategories function", () => {
   });
 });
 
-describe("getCategory function", () => {
-  it("parameter: category = Ergonomic", async () => {
-    const category = "Ergonomic";
+describe('getCategory function', () => {
+  it('parameter: category = Ergonomic', async () => {
+    const category = 'Ergonomic';
     const response = await Category.getCategory({
       name: category,
     });
@@ -44,7 +38,7 @@ describe("getCategory function", () => {
     expect(response).toEqual(expect.any(Number));
   });
 
-  it("no parameters -- THROWS ERROR", async () => {
+  it('no parameters -- THROWS ERROR', async () => {
     expect.assertions(1);
 
     try {
@@ -54,11 +48,11 @@ describe("getCategory function", () => {
     }
   });
 
-  it("faulty parameters -- THROWS ERROR", async () => {
+  it('faulty parameters -- THROWS ERROR', async () => {
     expect.assertions(1);
 
     try {
-      await Category.getCategory({ test: "WHATEVER" });
+      await Category.getCategory({ test: 'WHATEVER' });
     } catch (e) {
       expect(e).toEqual({ statusCode: 400, message: expect.any(String) });
     }

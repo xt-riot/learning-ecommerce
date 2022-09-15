@@ -1,24 +1,24 @@
-const { findSize, createSize } = require("./dbUtils.js");
+const { findSize, createSize } = require('./dbUtils');
 
 const Size = {
-  getSizes: async function () {
+  async getSizes() {
     try {
       const response = await findSize({ all: true });
 
       return response.rows.reduce((acc, size) => [...acc, size], []);
     } catch (e) {
-      throw {
+      throw new Error({
         statusCode: 500,
         message: e,
-      };
+      });
     }
   },
-  getSize: async function ({ size = "" } = {}, ...args) {
-    if (args.length > 0 || size === "") {
-      throw {
+  async getSize({ size = '' } = {}, ...args) {
+    if (args.length > 0 || size === '') {
+      throw new Error({
         statusCode: 400,
-        message: `Invalid parameters. Please contact an administrator.`,
-      };
+        message: 'Invalid parameters. Please contact an administrator.',
+      });
     }
 
     try {
@@ -26,24 +26,24 @@ const Size = {
 
       return response;
     } catch (e) {
-      throw {
+      throw new Error({
         statusCode: e.statusCode || 500,
         message: e.message,
-      };
+      });
     }
   },
-  addSize: async function ({ name }) {
-    const response = await this.getSize({ size: name });
+  async addSize({ name }) {
+    let response = await this.getSize({ size: name });
 
     if (response?.statusCode === 404) {
-      const response = await createSize({
-        name: name,
+      response = await createSize({
+        name,
       });
 
       return response;
     }
 
-    throw { statusCode: 400, message: `Size already exists.` };
+    throw new Error({ statusCode: 400, message: 'Size already exists.' });
   },
 };
 

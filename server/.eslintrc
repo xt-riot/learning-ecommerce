@@ -1,10 +1,16 @@
 {
-    "env": {
-      "node": true
-    },
-    "extends": "airbnb-base",
-    "plugins": ["promise"],
-    "rules": {
+  "parser": "@babel/eslint-parser",
+  "parserOptions": {
+    "requireConfigFile": false,
+  },
+  "env": {
+    "node": true,
+    "es6": true,
+    "jest/globals": true
+  },
+  "extends": "airbnb-base",
+  "plugins": ["promise", "eslint-plugin-jest"],
+  "rules": {
     "promise/always-return": "error",
     "promise/no-return-wrap": "error",
     "promise/param-names": "error",
@@ -14,6 +20,12 @@
     "promise/no-promise-in-callback": "error",
     "promise/no-callback-in-promise": "error",
     "promise/no-return-in-finally": "error",
-    "prefer-arrow-callback": "error"
+    "prefer-arrow-callback": "error",
+    "jest/no-disabled-tests": "warn",
+    "jest/no-focused-tests": "error",
+    "jest/no-identical-title": "error",
+    "jest/prefer-to-have-length": "warn",
+    "jest/valid-expect": "error",
+    "max-len": ["error", {"ignoreComments": true, "ignoreTrailingComments": true, "ignoreUrls": true, "code": 150}]
   }
 }

@@ -1,10 +1,4 @@
-const { Pool } = require("pg");
-const path = require("path");
-require("dotenv").config({
-  path: `${path.resolve(__dirname, "../../../.env")}`,
-});
-
-const Products = require("../../database/dbProduct.js");
+const Products = require('../../database/dbProduct');
 
 const product = {
   product_name: expect.any(String),
@@ -13,8 +7,8 @@ const product = {
   material: expect.any(String),
 };
 
-describe("getProducts function", () => {
-  it("no parameters", async () => {
+describe('getProducts function', () => {
+  it('no parameters', async () => {
     const response = await Products.getProducts();
 
     expect(response).toBeInstanceOf(Array);
@@ -26,12 +20,12 @@ describe("getProducts function", () => {
     });
   });
 
-  it("parameters: limit = 20", async () => {
+  it('parameters: limit = 20', async () => {
     const limit = 20;
-    const response = await Products.getProducts({ limit: limit });
+    const response = await Products.getProducts({ limit });
 
     expect(response).toBeInstanceOf(Array);
-    expect(response.length).toEqual(limit);
+    expect(response).toHaveLength(limit);
 
     response.forEach((item) => {
       expect(item).toEqual({
@@ -40,9 +34,9 @@ describe("getProducts function", () => {
     });
   });
 
-  it("parameters: offset = 20", async () => {
+  it('parameters: offset = 20', async () => {
     const offset = 20;
-    const response = await Products.getProducts({ offset: offset });
+    const response = await Products.getProducts({ offset });
 
     expect(response).toBeInstanceOf(Array);
     expect(response[0].id).toEqual(offset + 1);
@@ -54,16 +48,16 @@ describe("getProducts function", () => {
     });
   });
 
-  it("parameters: limit = 20, offset = 20", async () => {
+  it('parameters: limit = 20, offset = 20', async () => {
     const offset = 20;
     const limit = 20;
     const response = await Products.getProducts({
-      limit: limit,
-      offset: offset,
+      limit,
+      offset,
     });
 
     expect(response).toBeInstanceOf(Array);
-    expect(response.length).toEqual(limit);
+    expect(response).toHaveLength(limit);
     expect(response[0].id).toEqual(offset + 1);
 
     response.forEach((item) => {
@@ -73,12 +67,12 @@ describe("getProducts function", () => {
     });
   });
 
-  it("with faulty parameters -- THROWS ERROR", async () => {
+  it('with faulty parameters -- THROWS ERROR', async () => {
     expect.assertions(1);
 
     try {
       await Products.getProducts({
-        test: "WHATEVER",
+        test: 'WHATEVER',
       });
     } catch (e) {
       expect(e).toEqual({
@@ -88,15 +82,15 @@ describe("getProducts function", () => {
     }
   });
 
-  it("parameters: limit = -1, offset = 20 -- faulty parameters -- THROWS ERROR", async () => {
+  it('parameters: limit = -1, offset = 20 -- faulty parameters -- THROWS ERROR', async () => {
     expect.assertions(1);
     const offset = 20;
     const limit = -1;
 
     try {
       await Products.getProducts({
-        limit: limit,
-        offset: offset,
+        limit,
+        offset,
       });
     } catch (e) {
       expect(e).toEqual({
@@ -106,15 +100,15 @@ describe("getProducts function", () => {
     }
   });
 
-  it("parameters: limit = -1, offset = -1 -- faulty parameters -- THROWS ERROR", async () => {
+  it('parameters: limit = -1, offset = -1 -- faulty parameters -- THROWS ERROR', async () => {
     expect.assertions(1);
     const offset = -1;
     const limit = -1;
 
     try {
       await Products.getProducts({
-        limit: limit,
-        offset: offset,
+        limit,
+        offset,
       });
     } catch (e) {
       expect(e).toEqual({
@@ -124,15 +118,15 @@ describe("getProducts function", () => {
     }
   });
 
-  it("parameters: limit = 25, offset = -1 -- faulty parameters -- THROWS ERROR", async () => {
+  it('parameters: limit = 25, offset = -1 -- faulty parameters -- THROWS ERROR', async () => {
     expect.assertions(1);
     const offset = -1;
     const limit = 25;
 
     try {
       await Products.getProducts({
-        limit: limit,
-        offset: offset,
+        limit,
+        offset,
       });
     } catch (e) {
       expect(e).toEqual({
@@ -142,15 +136,15 @@ describe("getProducts function", () => {
     }
   });
 
-  it("parameters: limit = 25, offset = 100000 -- faulty parameters -- THROWS ERROR", async () => {
+  it('parameters: limit = 25, offset = 100000 -- faulty parameters -- THROWS ERROR', async () => {
     expect.assertions(1);
     const offset = 2000;
     const limit = 25;
 
     try {
       await Products.getProducts({
-        limit: limit,
-        offset: offset,
+        limit,
+        offset,
       });
     } catch (e) {
       expect(e).toEqual({
