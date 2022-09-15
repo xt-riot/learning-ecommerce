@@ -1,7 +1,7 @@
-require('dotenv').config();
-const express = require('express');
+require("dotenv").config();
+const express = require("express");
 // const path = require('path');
-const bodyParser = require('body-parser');
+const bodyParser = require("body-parser");
 // const cors = require('cors');
 
 const server = express();
@@ -11,7 +11,7 @@ const server = express();
 // };
 
 server.use(async (req, res, next) => {
-  if (process.env.NODE_ENV === 'test') {
+  if (process.env.NODE_ENV === "test") {
     await next();
     return;
   }
@@ -24,17 +24,17 @@ server.use(async (req, res, next) => {
 
 // server.use(cors(corsOptions));
 server.use((req, res, next) => {
-  res.header('Access-Control-Allow-Origin', '*');
+  res.header("Access-Control-Allow-Origin", "*");
   res.header(
-    'Access-Control-Allow-Headers',
-    'Origin, X-Requested-With, Content-Type, Accept',
+    "Access-Control-Allow-Headers",
+    "Origin, X-Requested-With, Content-Type, Accept"
   );
   next();
 });
 server.use(bodyParser.json());
 server.use(bodyParser.urlencoded({ extended: true }));
-server.use(express.static('public'));
+// server.use(express.static('public'));
 
-require('./routes/user.routes')(server);
+require("./routes/user.routes")(server);
 
 module.exports = server;
