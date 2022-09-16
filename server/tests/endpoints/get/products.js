@@ -91,6 +91,29 @@ describe("GET endpoints", () => {
     );
   });
 
+  it("should return products by category -- /products?category=", async () => {
+    const category = "Ergonomic";
+    const response = await request(app).get(`/products?category=${category}`);
+
+    expect(response.statusCode).toEqual(200);
+    expect(response.body.error).toBe(undefined);
+    expect(response.body).toBeInstanceOf(Object);
+    response.body.products.forEach((productIterator) => {
+      expect(productIterator.categoryname).toEqual(category);
+    });
+  });
+
+  it("should throw a 404 error -- wrong category /products?category=asddsa", async () => {
+    const category = "asddsa";
+    const response = await request(app).get(`/products?category=${category}`);
+
+    expect(response.statusCode).toEqual(404);
+    expect(response.body.error).toBe(undefined);
+    expect(response.body.message).toEqual(
+      `No products found under the category ${category}. Try again later or search another category.`
+    );
+  });
+
   it("should throw an error -- wrong parameters: id=-1", async () => {
     expect.assertions(2);
     const response = await request(app).get("/products?id=-1");

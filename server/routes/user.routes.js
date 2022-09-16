@@ -10,6 +10,28 @@ module.exports = (server) => {
     try {
       const response = await controller.findProduct(req.query);
 
+      if (req.query.category) {
+        const products = response.map((product) => ({
+          ...product,
+          thumbnail: new URL(
+            product.thumbnail,
+            `${process.env.NODE_HOST_URL}:${process.env.NODE_PORT}`
+          ).href,
+          image: new URL(
+            product.image,
+            `${process.env.NODE_HOST_URL}:${process.env.NODE_PORT}`
+          ).href,
+        }));
+
+        if (products.length === 0) {
+          throw {
+            statusCode: 404,
+            message: `No products found under the category ${req.query.category}. Try again later or search another category.`,
+          };
+        }
+
+        return res.status(200).json({ products });
+      }
       if (typeof response.products === typeof []) {
         const nextPage = await new URL(
           "/products",
