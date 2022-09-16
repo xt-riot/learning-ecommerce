@@ -275,6 +275,24 @@ const findOption = async (data) => {
   return response.rows;
 };
 
+const updateOption = async (product) => {
+  console.log(product);
+  const connection = await db.pool.connect();
+  const response = await connection.query(
+    `UPDATE product_options
+      SET color_id = ${product.color},
+          size_id = ${product.size},
+          quantity = product_options.quantity - ${product.quantity},
+          price = product_options.price - ${product.price}
+      WHERE product_id = ${product.oldProduct.id}
+        AND color_id = ${product.oldProduct.color}
+        AND size_id = ${product.oldProduct.size}
+      RETURNING *;`
+  );
+  connection.release(true);
+  return response;
+};
+
 const closeConnection = async () => {
   await db.pool.end();
 };
@@ -291,5 +309,6 @@ module.exports = {
   createProduct,
   findOption,
   createOption,
+  updateOption,
   closeConnection,
 };

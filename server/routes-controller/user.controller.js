@@ -201,3 +201,44 @@ exports.getSizes = async () => {
 
   return response;
 };
+
+exports.changeProduct = async (query) => {
+  const dataKeys = Object.keys(query.data);
+  const isDataValid = dataKeys
+    .map((key) => productMapper.includes(key))
+    .reduce((acc, item) => item && acc, true);
+
+  if (!isDataValid) {
+    throw { statusCode: 400, message: "Invalid data" };
+  }
+
+  const productConfig = await Products.getOption({ id: query.product.id });
+  console.log(productConfig);
+  const productToChange = productConfig.find(
+    (productToSearch) =>
+      productToSearch.color === query.product.color &&
+      productToSearch.size === query.product.size
+  );
+
+  if (!productToChange) {
+    throw {
+      statusCode: 400,
+      message: "Could not find the product -- cannot continue with the update.",
+    };
+  }
+
+  const productChanged = await Products.updateProduct({
+    oldProduct: productToChange,
+    color: query.data.color,
+    size: query.data.size,
+    price: query.data.price,
+    quantity: query.data.quantity,
+  });
+
+  if (!productChanged) {
+    throw {
+      statusCode: 500,
+      message: "Could not update the product. Please contact an administrator.",
+    };
+  }
+};

@@ -4,6 +4,7 @@ const {
   createProduct,
   findOption,
   createOption,
+  updateOption,
 } = require("./dbUtils");
 
 const Color = require("./dbColor");
@@ -186,6 +187,61 @@ const Products = {
     } catch (e) {
       throw { statusCode: e.statusCode || 500, message: e.message };
     }
+  },
+
+  async updateProduct(product) {
+    if (
+      !product.oldProduct ||
+      (!product.color && !product.size && !product.quantity && !product.price)
+    ) {
+      throw {
+        statusCode: 400,
+        message: "Missing product information -- cannot update the product.",
+      };
+    }
+
+    console.log("product in update", product);
+    const color = product.color
+      ? await Color.getColor({ color: product.color })
+      : await Color.getColor({ color: product.oldProduct.color });
+
+    if (color?.statusCode === 404) {
+      throw {
+        statusCode: 404,
+        message: `Color '${product?.color ?? "NOT_SPECIFIED"}' not found.`,
+      };
+    }
+
+    const size = product.size
+      ? await Size.getSize({ size: product.size })
+      : await Size.getSize({ size: product.oldProduct.size });
+
+    if (size?.statusCode === 404) {
+      throw {
+        statusCode: 404,
+        message: `Size '${product?.size ?? "NOT_SPECIFIED"}' not found.`,
+      };
+    }
+
+    product.oldProduct = {
+      ...product.oldProduct,
+      color: await Color.getColor({ color: product.oldProduct.color }),
+      size: await Size.getSize({ size: product.oldProduct.size }),
+    };
+
+    const response = await updateOption({
+      oldProduct: product.oldProduct,
+      color,
+      size,
+      quantity: product.quantity || 0,
+      price: product.price || 0,
+    });
+
+    if (response.rowCount === 0) {
+      return false;
+    }
+
+    return true;
   },
 };
 

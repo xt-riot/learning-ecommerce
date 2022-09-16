@@ -190,4 +190,13 @@ module.exports = (server) => {
       return res.status(e.statusCode || 500).json(e.message);
     }
   });
+
+  server.patch("/products", async (req, res) => {
+    try {
+      await controller.changeProduct(req.body);
+      return res.status(204).end();
+    } catch (e) {
+      return res.status(e.statusCode || 500).json(e.message);
+    }
+  });
 };
