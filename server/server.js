@@ -33,7 +33,8 @@ server.use((req, res, next) => {
 });
 server.use(bodyParser.json());
 server.use(bodyParser.urlencoded({ extended: true }));
-// server.use(express.static('public'));
+
+server.use("/public", express.static("public"));
 
 require("./routes/user.routes")(server);
 

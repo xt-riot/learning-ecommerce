@@ -10,20 +10,58 @@ module.exports = (server) => {
     try {
       const response = await controller.findProduct(req.query);
 
-      const message = response.products
-        ? {
-            nextPage: `${global.serverUrl}/products?p=${response.pagination}${
-              req.query?.limit ? `&limit=${response.limit}` : ""
-            }`,
-            products: response.products.map((product) => ({
-              ...product,
-              thumbnail: `${new URL(product.thumbnail, global.serverUrl)}`,
-              image: `${new URL(product.image, global.serverUrl)}`,
-            })),
-          }
-        : response;
+      if (typeof response.products === typeof []) {
+        const nextPage = await new URL(
+          "/products",
+          `${process.env.NODE_HOST_URL}:${process.env.NODE_PORT}`
+        );
+        const previousPage = await new URL(
+          "/products",
+          `${process.env.NODE_HOST_URL}:${process.env.NODE_PORT}`
+        );
 
-      return res.status(200).json(message);
+        if (response.pagination > 2) {
+          previousPage.searchParams.set("p", response.pagination - 2);
+        }
+        nextPage.searchParams.set("p", response.pagination);
+
+        if (req.query?.limit) {
+          nextPage.searchParams.set("limit", response.limit);
+          previousPage.searchParams.set("limit", response.limit);
+        }
+
+        const products = response.products.map((product) => ({
+          ...product,
+          thumbnail: new URL(
+            product.thumbnail,
+            `${process.env.NODE_HOST_URL}:${process.env.NODE_PORT}`
+          ).href,
+          image: new URL(
+            product.image,
+            `${process.env.NODE_HOST_URL}:${process.env.NODE_PORT}`
+          ).href,
+        }));
+
+        const message = {
+          nextPage: nextPage.href,
+          previousPage: previousPage.href,
+          products,
+        };
+
+        return res.status(200).json(message);
+      }
+
+      return res.status(200).json({
+        ...response,
+        thumbnail: new URL(
+          response.thumbnail,
+          `${process.env.NODE_HOST_URL}:${process.env.NODE_PORT}`
+        ).href,
+        image: new URL(
+          response.image,
+          `${process.env.NODE_HOST_URL}:${process.env.NODE_PORT}`
+        ).href,
+      });
     } catch (error) {
       return res
         .status(error.statusCode || 500)
