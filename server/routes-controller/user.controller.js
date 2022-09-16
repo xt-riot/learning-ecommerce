@@ -1,20 +1,20 @@
-const Products = require('../database/dbProduct');
-const Size = require('../database/dbSize');
-const Color = require('../database/dbColor');
-const Category = require('../database/dbCategory');
+const Products = require("../database/dbProduct");
+const Size = require("../database/dbSize");
+const Color = require("../database/dbColor");
+const Category = require("../database/dbCategory");
 
 const productMapper = [
-  'name',
-  'desc',
-  'price',
-  'quantity',
-  'category',
-  'color',
-  'size',
-  'material',
+  "name",
+  "desc",
+  "price",
+  "quantity",
+  "category",
+  "color",
+  "size",
+  "material",
 ];
 
-exports.indexPage = () => ({ statusCode: 200, data: '<h1>Index page</h1>' });
+exports.indexPage = () => ({ statusCode: 200, data: "<h1>Index page</h1>" });
 
 exports.findProduct = async (query) => {
   const parseID = parseInt(query?.id, 10);
@@ -28,39 +28,73 @@ exports.findProduct = async (query) => {
 
   const name = query.name || null;
 
+  const category = query.category || null;
+
+  if (category) {
+    const response = await Products.getProductByCategory(
+      category.replace(/"/g, "")
+    );
+
+    // console.log(response);
+    const products = response.map((product) =>
+      product.reduce(
+        (acc, item) => ({
+          ...acc,
+          ...item,
+          color: [...acc.color, item.color],
+          size: [...acc.size, item.size],
+          price: [...acc.price, item.price],
+          quantity: [...acc.quantity, item.quantity],
+        }),
+        {
+          color: [],
+          size: [],
+          price: [],
+          quantity: [],
+        }
+      )
+    );
+
+    return products;
+  }
+
   if (id === null && !name) {
     const response = await Products.getProducts(limit, pagination * limit);
 
     let products = await Promise.all(
-      response.map(async (product) => Products.getOption({
-        id: product.id,
-        name: product.product_name,
-      })),
+      response.map(async (product) =>
+        Products.getOption({
+          id: product.id,
+          name: product.product_name,
+        })
+      )
     );
 
-    products = products.map((product) => product.reduce(
-      (acc, item) => ({
-        ...acc,
-        ...item,
-        color: [...acc.color, item.color],
-        size: [...acc.size, item.size],
-        price: [...acc.price, item.price],
-        quantity: [...acc.quantity, item.quantity],
-      }),
-      {
-        color: [],
-        size: [],
-        price: [],
-        quantity: [],
-      },
-    ));
+    products = products.map((product) =>
+      product.reduce(
+        (acc, item) => ({
+          ...acc,
+          ...item,
+          color: [...acc.color, item.color],
+          size: [...acc.size, item.size],
+          price: [...acc.price, item.price],
+          quantity: [...acc.quantity, item.quantity],
+        }),
+        {
+          color: [],
+          size: [],
+          price: [],
+          quantity: [],
+        }
+      )
+    );
 
     return { products, pagination: pagination + 1, limit };
   }
 
   const response = await Products.getProduct({
     id,
-    name: name?.replace(/"/g, '').replace(/\s\s+/g, ' ').trim() || '',
+    name: name?.replace(/"/g, "").replace(/\s\s+/g, " ").trim() || "",
   });
 
   if (response?.statusCode === 400) {
@@ -86,7 +120,7 @@ exports.findProduct = async (query) => {
       size: [],
       price: [],
       quantity: [],
-    },
+    }
   );
 
   return product;
@@ -96,7 +130,7 @@ exports.addProduct = async (product) => {
   if (product === undefined) {
     throw {
       statusCode: 400,
-      message: 'Missing required information about product.',
+      message: "Missing required information about product.",
     };
   }
   const dataKeys = Object.keys(product);
@@ -110,10 +144,10 @@ exports.addProduct = async (product) => {
 };
 
 exports.addSize = async ({ name: size }) => {
-  if (size === undefined || typeof size !== 'string') {
+  if (size === undefined || typeof size !== "string") {
     throw {
       statusCode: 400,
-      message: 'Missing required information about size.',
+      message: "Missing required information about size.",
     };
   }
 
@@ -121,10 +155,10 @@ exports.addSize = async ({ name: size }) => {
 };
 
 exports.addColor = async ({ name: color }) => {
-  if (color === undefined || typeof color !== 'string') {
+  if (color === undefined || typeof color !== "string") {
     throw {
       statusCode: 400,
-      message: 'Missing required information about color.',
+      message: "Missing required information about color.",
     };
   }
 
@@ -133,12 +167,12 @@ exports.addColor = async ({ name: color }) => {
 
 exports.addCategory = async ({ name }) => {
   if (
-    name === undefined
-    || (typeof name !== 'string' && typeof name !== 'object')
+    name === undefined ||
+    (typeof name !== "string" && typeof name !== "object")
   ) {
     throw {
       statusCode: 400,
-      message: 'Missing required information about category.',
+      message: "Missing required information about category.",
     };
   }
 
