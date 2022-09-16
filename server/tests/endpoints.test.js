@@ -1,10 +1,10 @@
-const { closeConnection } = require('../database/dbUtils');
+const { closeConnection } = require("../database/dbUtils");
 
 afterAll(async () => {
   await closeConnection();
 });
 
-describe('Database functions', () => {
+describe("Database functions", () => {
   /* eslint-disable */
   require("./dbFunctions/getProduct");
   require("./dbFunctions/getProducts");

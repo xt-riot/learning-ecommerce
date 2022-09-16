@@ -17,42 +17,35 @@ const product = {
 
 const responseObject = {
   nextPage: expect.any(String),
+  previousPage: expect.any(String),
   products: expect.any(Array),
 };
 
 describe("GET endpoints", () => {
   // TODO: request fucks up the /products: it returns "INVALID URL" because it tries to fetch the first thumbnail
-  // it("should return a list of products -- /products", async () => {
-  //   // const remote = await request("http://localhost:1337");
-  //   // const response = await remote.get("/products");
-  //   const response = await request(app)
-  //     .get("/products")
-  //     .then((products) => {
-  //       console.log(products);
-  //       return products;
-  //     });
-  //   console.log(response);
+  it("should return a list of products -- /products", async () => {
+    const response = await request(app).get("/products");
 
-  //   expect(response.statusCode).toEqual(200);
-  //   expect(response.body.error).toBe(undefined);
-  //   expect(response.body).toEqual(responseObject);
+    expect(response.statusCode).toEqual(200);
+    expect(response.body.error).toBe(undefined);
+    expect(response.body).toEqual(responseObject);
 
-  //   response.body.products.forEach((item) => {
-  //     // expect(item).toEqual(product);
-  //     item.color.forEach((productColor) =>
-  //       expect(productColor).toEqual(expect.any(String))
-  //     );
-  //     item.size.forEach((productSize) =>
-  //       expect(productSize).toEqual(expect.any(String))
-  //     );
-  //     item.quantity.forEach((productQuantity) =>
-  //       expect(productQuantity).toEqual(expect.any(Number))
-  //     );
-  //     item.price.forEach((productPrice) =>
-  //       expect(productPrice).toEqual(expect.any(Number))
-  //     );
-  //   });
-  // });
+    response.body.products.forEach((item) => {
+      // expect(item).toEqual(product);
+      item.color.forEach((productColor) =>
+        expect(productColor).toEqual(expect.any(String))
+      );
+      item.size.forEach((productSize) =>
+        expect(productSize).toEqual(expect.any(String))
+      );
+      item.quantity.forEach((productQuantity) =>
+        expect(productQuantity).toEqual(expect.any(Number))
+      );
+      item.price.forEach((productPrice) =>
+        expect(productPrice).toEqual(expect.any(Number))
+      );
+    });
+  });
 
   it("should return one product with id 1 -- /products?id=1", async () => {
     const response = await request(app).get("/products?id=1");
