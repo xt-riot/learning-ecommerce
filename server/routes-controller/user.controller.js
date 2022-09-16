@@ -59,7 +59,10 @@ exports.findProduct = async (query) => {
   }
 
   if (id === null && !name) {
-    const response = await Products.getProducts(limit, pagination * limit);
+    const response = await Products.getProducts({
+      limit,
+      offset: pagination * limit,
+    });
 
     let products = await Promise.all(
       response.map(async (product) =>

@@ -91,6 +91,49 @@ describe("GET endpoints", () => {
     );
   });
 
+  it("should return 25 products -- /products?limit=25", async () => {
+    const limit = 25;
+    const response = await request(app).get(`/products?limit=${limit}`);
+
+    expect(response.statusCode).toEqual(200);
+    expect(response.body.error).toBe(undefined);
+    expect(response.body).toBeInstanceOf(Object);
+    expect(response.body.nextPage).toEqual(expect.any(String));
+    expect(response.body.previousPage).toEqual(expect.any(String));
+    expect(response.body.products).toHaveLength(limit);
+
+    response.body.products.forEach((productIterator) => {
+      expect(productIterator).toEqual(product);
+    });
+  });
+
+  it("should return 25 products at page 5 (starting id: (limit*page)+1 = 126) -- /products?limit=25&p=1", async () => {
+    const limit = 25;
+    const page = 5;
+    const response = await request(app).get(
+      `/products?limit=${limit}&p=${page}`
+    );
+
+    expect(response.statusCode).toEqual(200);
+    expect(response.body.error).toBe(undefined);
+    expect(response.body).toBeInstanceOf(Object);
+    expect(response.body.nextPage).toEqual(
+      `${process.env.NODE_HOST_URL}:${process.env.NODE_PORT}/products?p=${
+        page + 1
+      }&limit=${limit}`
+    );
+    expect(response.body.previousPage).toEqual(
+      `${process.env.NODE_HOST_URL}:${process.env.NODE_PORT}/products?p=${
+        page - 1
+      }&limit=${limit}`
+    );
+    expect(response.body.products).toHaveLength(limit);
+
+    response.body.products.forEach((productIterator) => {
+      expect(productIterator).toEqual(product);
+    });
+  });
+
   it("should return products by category -- /products?category=", async () => {
     const category = "Ergonomic";
     const response = await request(app).get(`/products?category=${category}`);

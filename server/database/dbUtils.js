@@ -208,7 +208,6 @@ const findProduct = async (product) => {
       LIMIT ${product.limit} OFFSET ${product.offset}
       ;`
   );
-
   connection.release(true);
   return response.rows;
 };
