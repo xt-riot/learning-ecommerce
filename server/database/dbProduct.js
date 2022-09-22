@@ -223,14 +223,14 @@ const Products = {
       };
     }
 
-    product.oldProduct = {
+    const oldProduct = {
       ...product.oldProduct,
       color: await Color.getColor({ color: product.oldProduct.color }),
       size: await Size.getSize({ size: product.oldProduct.size }),
     };
 
     const response = await updateOption({
-      oldProduct: product.oldProduct,
+      oldProduct,
       color,
       size,
       quantity: product.quantity || 0,

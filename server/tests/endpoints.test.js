@@ -6,16 +6,16 @@ afterAll(async () => {
 
 describe("Database functions", () => {
   /* eslint-disable */
-  // require("./dbFunctions/getProduct");
-  // require("./dbFunctions/getProducts");
-  // require("./dbFunctions/colors");
-  // require("./dbFunctions/sizes");
-  // require("./dbFunctions/categories");
+  require("./dbFunctions/getProduct");
+  require("./dbFunctions/getProducts");
+  require("./dbFunctions/colors");
+  require("./dbFunctions/sizes");
+  require("./dbFunctions/categories");
 });
 
 describe("Endpoints", () => {
   require("./endpoints/get/products");
-  // require("./endpoints/post/products");
+  require("./endpoints/post/products");
   /* eslint-enable */
 });
 
