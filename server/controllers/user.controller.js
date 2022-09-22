@@ -1,7 +1,7 @@
-const Products = require("../database/dbProduct");
-const Size = require("../database/dbSize");
-const Color = require("../database/dbColor");
-const Category = require("../database/dbCategory");
+const Products = require("../services/dbProduct");
+const Size = require("../services/dbSize");
+const Color = require("../services/dbColor");
+const Category = require("../services/dbCategory");
 
 const productMapper = [
   "name",

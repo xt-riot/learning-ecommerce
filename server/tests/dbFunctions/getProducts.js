@@ -1,4 +1,4 @@
-const Products = require('../../database/dbProduct');
+const Products = require("../../services/dbProduct");
 
 const product = {
   product_name: expect.any(String),
@@ -7,8 +7,8 @@ const product = {
   material: expect.any(String),
 };
 
-describe('getProducts function', () => {
-  it('no parameters', async () => {
+describe("getProducts function", () => {
+  it("no parameters", async () => {
     const response = await Products.getProducts();
 
     expect(response).toBeInstanceOf(Array);
@@ -20,7 +20,7 @@ describe('getProducts function', () => {
     });
   });
 
-  it('parameters: limit = 20', async () => {
+  it("parameters: limit = 20", async () => {
     const limit = 20;
     const response = await Products.getProducts({ limit });
 
@@ -34,7 +34,7 @@ describe('getProducts function', () => {
     });
   });
 
-  it('parameters: offset = 20', async () => {
+  it("parameters: offset = 20", async () => {
     const offset = 20;
     const response = await Products.getProducts({ offset });
 
@@ -48,7 +48,7 @@ describe('getProducts function', () => {
     });
   });
 
-  it('parameters: limit = 20, offset = 20', async () => {
+  it("parameters: limit = 20, offset = 20", async () => {
     const offset = 20;
     const limit = 20;
     const response = await Products.getProducts({
@@ -67,12 +67,12 @@ describe('getProducts function', () => {
     });
   });
 
-  it('with faulty parameters -- THROWS ERROR', async () => {
+  it("with faulty parameters -- THROWS ERROR", async () => {
     expect.assertions(1);
 
     try {
       await Products.getProducts({
-        test: 'WHATEVER',
+        test: "WHATEVER",
       });
     } catch (e) {
       expect(e).toEqual({
@@ -82,7 +82,7 @@ describe('getProducts function', () => {
     }
   });
 
-  it('parameters: limit = -1, offset = 20 -- faulty parameters -- THROWS ERROR', async () => {
+  it("parameters: limit = -1, offset = 20 -- faulty parameters -- THROWS ERROR", async () => {
     expect.assertions(1);
     const offset = 20;
     const limit = -1;
@@ -100,7 +100,7 @@ describe('getProducts function', () => {
     }
   });
 
-  it('parameters: limit = -1, offset = -1 -- faulty parameters -- THROWS ERROR', async () => {
+  it("parameters: limit = -1, offset = -1 -- faulty parameters -- THROWS ERROR", async () => {
     expect.assertions(1);
     const offset = -1;
     const limit = -1;
@@ -118,7 +118,7 @@ describe('getProducts function', () => {
     }
   });
 
-  it('parameters: limit = 25, offset = -1 -- faulty parameters -- THROWS ERROR', async () => {
+  it("parameters: limit = 25, offset = -1 -- faulty parameters -- THROWS ERROR", async () => {
     expect.assertions(1);
     const offset = -1;
     const limit = 25;
@@ -136,7 +136,7 @@ describe('getProducts function', () => {
     }
   });
 
-  it('parameters: limit = 25, offset = 100000 -- faulty parameters -- THROWS ERROR', async () => {
+  it("parameters: limit = 25, offset = 100000 -- faulty parameters -- THROWS ERROR", async () => {
     expect.assertions(1);
     const offset = 2000;
     const limit = 25;

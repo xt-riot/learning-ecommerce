@@ -1,4 +1,4 @@
-const { closeConnection } = require("../database/dbUtils");
+const { closeConnection } = require("../services/dbUtils");
 
 afterAll(async () => {
   await closeConnection();

@@ -1,5 +1,5 @@
 const server = require("./server");
-const { closeConnection } = require("./database/dbUtils");
+const { closeConnection } = require("./services/dbUtils");
 
 server.listen(process.env.NODE_PORT || 1337, () => {
   console.log(
