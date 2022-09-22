@@ -1,34 +1,33 @@
-const controller = require("../routes-controller/user.controller.js");
+const controller = require("../controllers/user.controller");
 
 module.exports = (server) => {
-  server.get("/", async (req, res, next) => {
-    const response = await controller.indexPage();
-    return res.status(response.statusCode).send(response.data);
-  });
+  server.get("/products", controller.findProduct);
+  server.get("/categories", controller.getCategories);
+  server.get("/colors", controller.getColors);
+  server.get("/sizes", controller.getSizes);
 
-  server.get("/products", async (req, res, next) => {
-    const parseID = parseInt(req.query.id, 10);
-    const id = !Number.isNaN(parseID) ? parseID : -1;
+  server.post("/products", controller.addProduct);
+  server.post("/sizes", controller.addSize);
+  server.post("/categories", controller.addCategory);
+  server.post("/colors", controller.addColor);
 
-    const response = await controller.findProduct(id);
-
-    return res.json(response);
-  });
-
-  server.post("/products", async (req, res, next) => {
-    const parseID = parseInt(req.body.id, 10);
-    const id = !Number.isNaN(parseID) ? parseID : -1;
-    const data = req.body.changeData;
-
-    if (id === -1 || !data)
-      return res
-        .status(400)
-        .json({ error: "The id or changeData is required." });
-
-    const response = await controller.changeProduct(id, data);
-    if (response === -1)
-      return res.status(400).json({ error: "Wrong changeData." });
-
-    return res.json(response);
-  });
+  server.patch("/products", controller.changeProduct);
 };
+
+// TODO: Implement this
+// server.post("/products", async (req, res) => {
+//   const parseID = parseInt(req.body.id, 10);
+//   const id = !Number.isNaN(parseID) ? parseID : -1;
+//   const data = req.body.changeData;
+
+//   if (id === -1 || !data)
+//     return res
+//       .status(400)
+//       .json({ error: "The id or changeData is required." });
+
+//   const response = await controller.changeProduct(id, data);
+//   if (response === -1)
+//     return res.status(400).json({ error: "Wrong changeData." });
+
+//   return res.json(response);
+// });

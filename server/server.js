@@ -1,18 +1,20 @@
 require("dotenv").config();
 const express = require("express");
-const path = require("path");
+// const path = require('path');
 const bodyParser = require("body-parser");
-const cors = require("cors");
+// const cors = require('cors');
 
 const server = express();
-var corsOptions = {
-  origin: "http://localhost:5173",
-  "Access-Control-Allow-Origin": "*",
-};
-var environment = process.env.NODE_ENV || "development";
-var port = process.env.NODE_PORT || 1337;
+// var corsOptions = {
+//   origin: "http://localhost:5173",
+//   "Access-Control-Allow-Origin": "*",
+// };
 
 server.use(async (req, res, next) => {
+  if (process.env.NODE_ENV === "test") {
+    await next();
+    return;
+  }
   const start = Date.now();
   await next();
   const duration = Date.now() - start;
@@ -21,7 +23,7 @@ server.use(async (req, res, next) => {
 });
 
 // server.use(cors(corsOptions));
-server.use(function (req, res, next) {
+server.use((req, res, next) => {
   res.header("Access-Control-Allow-Origin", "*");
   res.header(
     "Access-Control-Allow-Headers",
@@ -31,16 +33,9 @@ server.use(function (req, res, next) {
 });
 server.use(bodyParser.json());
 server.use(bodyParser.urlencoded({ extended: true }));
-server.use(express.static("public"));
 
-require("./routes/user.routes.js")(server);
+server.use("/public", express.static("public"));
 
-server.listen(port, () => {
-  console.log(
-    "Server Listening - http://localhost:" +
-      port +
-      ". " +
-      environment +
-      " environment"
-  );
-});
+require("./routes/user.routes")(server);
+
+module.exports = server;

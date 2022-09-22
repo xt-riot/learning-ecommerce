@@ -1,0 +1,15 @@
+version: '3.8'
+
+services:
+  test_db:
+    container_name: test_db
+    image: postgres:14.5-alpine
+    restart: always
+    environment:
+      - POSTGRES_USER=${DATABASE_USER}
+      - POSTGRES_PASSWORD=${DATABASE_PASSWORD}
+      - POSTGRES_DB=${DATABASE_NAME}
+    ports:
+      - "1001:5432"
+    volumes:
+      - ./db/init.sql:/docker-entrypoint-initdb.d/create_tables.sql
